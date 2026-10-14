@@ -1,0 +1,216 @@
+.login-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px 20px;
+}
+
+.login-card {
+  width: min(100%, 430px);
+  padding: 42px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 3%), transparent 40%),
+    var(--color-surface);
+  box-shadow: 0 28px 90px rgb(0 0 0 / 42%), 0 0 75px rgb(201 29 56 / 8%);
+}
+
+.login-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  text-decoration: none;
+}
+
+.login-brand-mark {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border: 1px solid rgb(255 111 124 / 26%);
+  border-radius: 11px;
+  background: var(--gradient-accent);
+  box-shadow: 0 5px 20px rgb(245 41 62 / 32%);
+}
+
+.login-brand-mark svg {
+  width: 23px;
+  height: 23px;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.1;
+}
+
+.login-heading {
+  margin-top: 42px;
+}
+
+.login-kicker {
+  color: var(--color-accent-light);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.45px;
+}
+
+.login-heading h1 {
+  margin: 13px 0 8px;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+}
+
+.login-heading p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 31px;
+}
+
+.login-form > .ui-button {
+  margin-top: 24px;
+}
+
+.login-form > label:not(.login-remember),
+.login-password-label label {
+  color: var(--color-text-soft);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-password-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+}
+
+.login-password-label a {
+  color: var(--color-accent-light);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.login-password-label a:hover {
+  color: var(--color-text);
+}
+
+.login-remember {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  margin-top: 17px;
+  color: var(--color-text-soft);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.login-remember input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.login-checkbox {
+  display: grid;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #51484b;
+  border-radius: 4px;
+  background: var(--color-surface-raised);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.login-remember input:checked + .login-checkbox {
+  border-color: var(--color-accent);
+  background: var(--gradient-accent);
+}
+
+.login-remember input:checked + .login-checkbox::after {
+  width: 7px;
+  height: 4px;
+  border-bottom: 1.5px solid white;
+  border-left: 1.5px solid white;
+  content: "";
+  transform: translateY(-1px) rotate(-45deg);
+}
+
+.login-remember input:focus-visible + .login-checkbox {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
+.login-security {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 27px 0 0;
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.login-security svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  stroke: var(--color-accent-muted);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.2;
+}
+
+.login-page a:focus-visible,
+.login-page button:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 20px 16px;
+  }
+
+  .login-card {
+    padding: 32px 25px;
+  }
+
+  .login-heading {
+    margin-top: 36px;
+  }
+
+  .login-security {
+    align-items: flex-start;
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page *,
+  .login-page *::before,
+  .login-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

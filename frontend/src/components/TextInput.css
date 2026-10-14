@@ -1,0 +1,91 @@
+.text-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 49px;
+  margin-top: 9px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface-raised);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.text-input:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgb(255 52 72 / 10%);
+}
+
+.text-input__control {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  padding: 0 13px;
+  border: 0;
+  outline: 0;
+  color: var(--color-text);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+}
+
+.text-input__control::placeholder {
+  color: var(--color-placeholder);
+}
+
+.text-input__adornment {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--color-icon);
+}
+
+.text-input__adornment--start {
+  width: 17px;
+  height: 17px;
+  margin-left: 14px;
+}
+
+.text-input__adornment--end {
+  margin-right: 5px;
+}
+
+.text-input__adornment--end button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.text-input__adornment--end button:hover {
+  color: var(--color-text);
+}
+
+.text-input__adornment--end button:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 1px;
+}
+
+.text-input__adornment--end button svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
+}
+
+.text-input__adornment--start > svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.3;
+}

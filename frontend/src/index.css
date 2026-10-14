@@ -1,0 +1,62 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+:root {
+  font-family: "DM Sans", sans-serif;
+  color: #f6f3f4;
+  background-color: #0b0a0c;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --color-background: #0b0a0c;
+  --color-surface: #111012;
+  --color-surface-raised: #171517;
+  --color-border: #302c2e;
+  --color-accent: #ff3448;
+  --color-accent-light: #ff5969;
+  --color-accent-muted: #ba4855;
+  --color-text: #f6f3f4;
+  --color-text-soft: #e6e0e1;
+  --color-text-muted: #928b8d;
+  --color-icon: #81777a;
+  --color-placeholder: #645e60;
+  --gradient-accent: linear-gradient(110deg, #fb3b50 0%, #e92740 55%, #c91d38 100%);
+  --font-display: "Manrope", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 0;
+  min-height: 100%;
+  background: var(--color-background);
+}
+
+body {
+  min-width: 0;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-text);
+  background:
+    radial-gradient(ellipse at 12% 12%, rgb(101 17 29 / 22%), transparent 36%),
+    radial-gradient(ellipse at 92% 88%, rgb(91 17 29 / 13%), transparent 33%),
+    var(--color-background);
+  font-family: "DM Sans", sans-serif;
+}
+
+#root,
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-layout {
+  background:
+    radial-gradient(ellipse at 12% 12%, rgb(101 17 29 / 10%), transparent 36%),
+    radial-gradient(ellipse at 92% 88%, rgb(91 17 29 / 8%), transparent 33%);
+}
