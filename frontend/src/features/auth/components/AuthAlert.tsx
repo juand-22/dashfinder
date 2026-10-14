@@ -1,6 +1,11 @@
 import "./AuthAlert.css";
 
-export type AuthAlertType = "invalid-credentials" | "server-error";
+export type AuthAlertType =
+  | "invalid-credentials"
+  | "username-exists"
+  | "invalid-input"
+  | "password-mismatch"
+  | "server-error";
 
 type AuthAlertProps = {
   type: AuthAlertType;
@@ -9,6 +14,9 @@ type AuthAlertProps = {
 
 const messages: Record<AuthAlertType, string> = {
   "invalid-credentials": "Usuario o contraseña incorrectos. Verifica tus datos e inténtalo de nuevo.",
+  "username-exists": "Este nombre de usuario ya está registrado. Prueba con otro.",
+  "invalid-input": "Revisa los datos: el usuario debe tener entre 3 y 30 caracteres y la contraseña entre 8 y 72.",
+  "password-mismatch": "Las contraseñas no coinciden.",
   "server-error": "Ocurrió un error en el servidor. Inténtalo de nuevo más tarde.",
 };
 

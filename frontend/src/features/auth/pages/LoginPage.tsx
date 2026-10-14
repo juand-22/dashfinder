@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button, TextInput } from "../../../components";
 import { AuthAlert, type AuthAlertType } from "../components/AuthAlert";
-import { login, LoginRequestError } from "../auth.api";
+import { AuthRequestError, login } from "../auth.api";
+import { useAuth } from "../context/auth.context";
 import "./LoginPage.css";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { setAuthenticatedUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<AuthAlertType | null>(null);
   const [alertAnimationKey, setAlertAnimationKey] = useState(0);
@@ -24,18 +26,15 @@ export function LoginPage() {
     const formData = new FormData(event.currentTarget);
 
     try {
-      const result = await login({
+      const user = await login({
         username: String(formData.get("username") ?? ""),
         password: String(formData.get("password") ?? ""),
       });
-      const storage = formData.get("remember") === "on" ? localStorage : sessionStorage;
-      localStorage.removeItem("dashfinder_token");
-      sessionStorage.removeItem("dashfinder_token");
-      storage.setItem("dashfinder_token", result.token);
+      setAuthenticatedUser(user);
       navigate("/");
     } catch (error) {
       showLoginError(
-        error instanceof LoginRequestError ? error.alertType : "server-error",
+        error instanceof AuthRequestError ? error.alertType : "server-error",
       );
     } finally {
       setIsSubmitting(false);
@@ -144,6 +143,9 @@ export function LoginPage() {
             <path d="m5.8 7.8 1.5 1.5 3-3" />
           </svg>
           Tus datos están protegidos y siempre son tuyos.
+        </p>
+        <p className="auth-switch">
+          ¿Aún no tienes cuenta? <Link to="/register">Crear cuenta</Link>
         </p>
       </section>
     </main>

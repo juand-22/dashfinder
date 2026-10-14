@@ -25,7 +25,6 @@ export async function register(data: RegisterInput) {
     select: {
       id: true,
       username: true,
-      createdAt: true
     }
   });
 

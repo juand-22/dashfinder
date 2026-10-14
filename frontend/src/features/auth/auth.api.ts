@@ -3,59 +3,72 @@ export type LoginCredentials = {
   password: string;
 };
 
-type LoginResponse = {
-  user: {
-    id: number;
-    username: string;
-  };
-  token: string;
+export type AuthUser = {
+  id: number;
+  username: string;
 };
 
-export class LoginRequestError extends Error {
-  readonly alertType: "invalid-credentials" | "server-error";
+export type AuthRequestErrorType =
+  | "invalid-credentials"
+  | "username-exists"
+  | "invalid-input"
+  | "server-error";
 
-  constructor(alertType: "invalid-credentials" | "server-error") {
+export class AuthRequestError extends Error {
+  readonly alertType: AuthRequestErrorType;
+
+  constructor(alertType: AuthRequestErrorType) {
     super(alertType);
-    this.name = "LoginRequestError";
+    this.name = "AuthRequestError";
     this.alertType = alertType;
   }
 }
 
 const apiBaseUrl = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
 
-export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
+async function requestAuth(
+  endpoint: "login" | "register",
+  credentials: LoginCredentials,
+): Promise<AuthUser> {
   let response: Response;
 
   try {
-    response = await fetch(`${apiBaseUrl}/api/auth/login`, {
+    response = await fetch(`${apiBaseUrl}/api/auth/${endpoint}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
+      credentials: "include",
     });
   } catch {
-    throw new LoginRequestError("server-error");
+    throw new AuthRequestError("server-error");
   }
 
-  if (response.status === 401) {
-    throw new LoginRequestError("invalid-credentials");
+  if (response.status === 401 && endpoint === "login") {
+    throw new AuthRequestError("invalid-credentials");
+  }
+
+  if (response.status === 409 && endpoint === "register") {
+    throw new AuthRequestError("username-exists");
+  }
+
+  if (response.status === 400) {
+    throw new AuthRequestError("invalid-input");
   }
 
   if (!response.ok) {
-    throw new LoginRequestError("server-error");
+    throw new AuthRequestError("server-error");
   }
 
   let result: unknown;
   try {
     result = await response.json();
   } catch {
-    throw new LoginRequestError("server-error");
+    throw new AuthRequestError("server-error");
   }
 
   if (
     typeof result !== "object" ||
     result === null ||
-    !("token" in result) ||
-    typeof result.token !== "string" ||
     !("user" in result) ||
     typeof result.user !== "object" ||
     result.user === null ||
@@ -64,14 +77,63 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
     !("username" in result.user) ||
     typeof result.user.username !== "string"
   ) {
-    throw new LoginRequestError("server-error");
+    throw new AuthRequestError("server-error");
   }
 
-  return {
-    token: result.token,
-    user: {
-      id: result.user.id,
-      username: result.user.username,
-    },
-  };
+  return { id: result.user.id, username: result.user.username };
+}
+
+export function login(credentials: LoginCredentials): Promise<AuthUser> {
+  return requestAuth("login", credentials);
+}
+
+export function register(credentials: LoginCredentials): Promise<AuthUser> {
+  return requestAuth("register", credentials);
+}
+
+export async function getCurrentUser(signal?: AbortSignal): Promise<AuthUser | null> {
+  let response: Response;
+
+  try {
+    response = await fetch(`${apiBaseUrl}/api/auth/me`, {
+      credentials: "include",
+      signal,
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") throw error;
+    throw new AuthRequestError("server-error");
+  }
+
+  if (response.status === 401) return null;
+  if (!response.ok) throw new AuthRequestError("server-error");
+
+  let result: unknown;
+  try {
+    result = await response.json();
+  } catch {
+    throw new AuthRequestError("server-error");
+  }
+
+  if (
+    typeof result !== "object" ||
+    result === null ||
+    !("user" in result) ||
+    typeof result.user !== "object" ||
+    result.user === null ||
+    !("username" in result.user) ||
+    typeof result.user.username !== "string"
+  ) {
+    throw new AuthRequestError("server-error");
+  }
+
+  const userId =
+    "id" in result.user && typeof result.user.id === "number"
+      ? result.user.id
+      : "userId" in result.user && typeof result.user.userId === "number"
+        ? result.user.userId
+        : null;
+
+  if (userId === null) throw new AuthRequestError("server-error");
+
+  return { id: userId, username: result.user.username };
 }
