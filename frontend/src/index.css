@@ -10,7 +10,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --color-background: #0b0a0c;
+  --color-background: #0b090b;
   --color-surface: #111012;
   --color-surface-raised: #171517;
   --color-border: #302c2e;
@@ -44,8 +44,8 @@ body {
   margin: 0;
   color: var(--color-text);
   background:
-    radial-gradient(ellipse at 12% 12%, rgb(101 17 29 / 22%), transparent 36%),
-    radial-gradient(ellipse at 92% 88%, rgb(91 17 29 / 13%), transparent 33%),
+    radial-gradient(ellipse at 12% 12%, rgb(78 13 25 / 15%), transparent 40%),
+    radial-gradient(ellipse at 92% 88%, rgb(58 10 20 / 9%), transparent 37%),
     var(--color-background);
   font-family: "DM Sans", sans-serif;
 }
@@ -57,6 +57,6 @@ body {
 
 .app-layout {
   background:
-    radial-gradient(ellipse at 12% 12%, rgb(101 17 29 / 10%), transparent 36%),
-    radial-gradient(ellipse at 92% 88%, rgb(91 17 29 / 8%), transparent 33%);
+    radial-gradient(ellipse at 12% 12%, rgb(67 11 22 / 7%), transparent 40%),
+    radial-gradient(ellipse at 92% 88%, rgb(49 9 18 / 5%), transparent 37%);
 }
