@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 import App from "../App";
 import { LoginPage, RegisterPage } from "../features/auth";
+import { HomePage } from "../features/find/HomePage";
 import { GuestOnly, RequireAuth } from "./AuthGuards";
 
 
@@ -13,7 +14,7 @@ export const router = createBrowserRouter([
             {
                 element: <RequireAuth />,
                 children: [
-                    { index: true, element: <div>Home</div> },
+                    { index: true, element: <HomePage /> },
                 ],
             },
             {
