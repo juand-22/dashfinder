@@ -1,252 +1,181 @@
-import { prisma } from "../../lib/prisma";
-import { mcDb } from "../../lib/mc_db";
-import { QueryTypes } from "sequelize";
+import * as modRepository from "./mod.repository";
+import type { RecivePlayersInput } from "./mod.schema";
+import type {
+  FoundPlayerField,
+  LastPlayerField,
+  McUser,
+  ServerPlayerField,
+} from "./mod.types";
 
-export type RecivePlayers = {
-  server: string;
-  players: {
-    nick: string;
-    rank?: string | null;
-  }[];
-};
-
-type McUser = {
-  name: string;
-  ip: string | null;
-  password: string | null;
-  salt: string | null;
-  serverip: string | null;
-  server: string | null;
-};
-
-async function findMcUsers(nick: string): Promise<McUser[]> {
-  const rows = await mcDb.query(
-    `SELECT name, ip, password, salt, serverip, server
-     FROM usuarios
-     WHERE name = :nick`,
-    {
-      replacements: { nick },
-      type: QueryTypes.SELECT,
-    }
-  );
-
-  return rows as McUser[];
-}
-
-export async function recivePlayers(
-  data: RecivePlayers,
-  userId: number
-) {
-  const now = new Date();
-
-  // 1. Crear o actualizar la última actividad del usuario
-  let activity = await prisma.activity.findUnique({
-    where: { userId },
-  });
+async function upsertActivity(userId: number, serverip: string, now: Date) {
+  const activity = await modRepository.findActivityByUser(userId);
 
   if (!activity) {
-    activity = await prisma.activity.create({
-      data: {
-        userId,
-        serverip: data.server,
-        lastDateRequest: now,
-      },
-    });
-  } else {
-    activity = await prisma.activity.update({
-      where: { userId },
-      data: {
-        serverip: data.server,
-        lastDateRequest: now,
-      },
-    });
+    return modRepository.createActivity(userId, serverip, now);
   }
 
-  // 2. Consultar cada nick en la base externa
+  return modRepository.updateActivity(userId, serverip, now);
+}
+
+async function collectMcResults(players: RecivePlayersInput["players"]) {
   const mcResults = new Map<string, McUser[]>();
 
-  for (const player of data.players) {
-    const results = await findMcUsers(player.nick);
+  for (const player of players) {
+    const results = await modRepository.findMcUsersByNick(player.nick);
     mcResults.set(player.nick, results);
   }
 
-  // 3. Reemplazar los últimos jugadores enviados
-  await prisma.activiteLastPlayers.deleteMany({
-    where: { activityId: activity.id },
+  return mcResults;
+}
+
+function buildLastPlayerFields(
+  players: RecivePlayersInput["players"],
+  mcResults: Map<string, McUser[]>,
+): LastPlayerField[] {
+  return players.map((player) => {
+    const results = mcResults.get(player.nick) ?? [];
+
+    return {
+      name: player.nick,
+      rank: player.rank ?? "",
+      found: results.length > 0,
+    };
   });
+}
 
-  if (data.players.length > 0) {
-    await prisma.activiteLastPlayers.createMany({
-      data: data.players.map((player) => {
-        const results = mcResults.get(player.nick) ?? [];
+function buildFoundPlayerFields(
+  players: RecivePlayersInput["players"],
+  mcResults: Map<string, McUser[]>,
+): FoundPlayerField[] {
+  return players.flatMap((player): FoundPlayerField[] => {
+    const results = mcResults.get(player.nick) ?? [];
 
-        return {
-          activityId: activity.id,
+    if (results.length === 0) {
+      return [
+        {
           name: player.nick,
           rank: player.rank ?? "",
-          found: results.length > 0,
-        };
-      }),
-    });
+          found: false,
+          ip: null,
+          password: null,
+          salt: null,
+          serverip: null,
+          servername: null,
+        },
+      ];
+    }
+
+    return results.map((result): FoundPlayerField => ({
+      name: player.nick,
+      rank: player.rank ?? "",
+      found: true,
+      ip: result.ip ?? null,
+      password: result.password ?? null,
+      salt: result.salt ?? null,
+      serverip: result.serverip ?? null,
+      servername: result.server ?? null,
+    }));
+  });
+}
+
+function buildPlayerFields(
+  players: RecivePlayersInput["players"],
+  mcResults: Map<string, McUser[]>,
+): ServerPlayerField[] {
+  return players.map((player) => {
+    const found = (mcResults.get(player.nick) ?? [])[0];
+
+    return {
+      name: player.nick,
+      rank: player.rank ?? null,
+      found: Boolean(found),
+      ip: found?.ip ?? null,
+      password: found?.password ?? null,
+      salt: found?.salt ?? null,
+      serverip: found?.serverip ?? null,
+      servername: found?.server ?? null,
+    };
+  });
+}
+
+export async function recivePlayers(data: RecivePlayersInput, userId: number) {
+  const now = new Date();
+
+  // 1. Crear o actualizar la última actividad del usuario
+  const activity = await upsertActivity(userId, data.server, now);
+
+  // 2. Consultar cada nick en la base externa
+  const mcResults = await collectMcResults(data.players);
+
+  // 3. Reemplazar los últimos jugadores enviados
+  await modRepository.deleteLastPlayers(activity.id);
+
+  if (data.players.length > 0) {
+    await modRepository.createLastPlayers(
+      activity.id,
+      buildLastPlayerFields(data.players, mcResults),
+    );
   }
 
   // 4. Reemplazar los últimos jugadores encontrados
-  await prisma.activityLastFoundPlayers.deleteMany({
-    where: { activityId: activity.id },
-  });
+  await modRepository.deleteLastFoundPlayers(activity.id);
 
   if (data.players.length > 0) {
-    const activityFoundPlayers = data.players.flatMap((player) => {
-      const results = mcResults.get(player.nick) ?? [];
-
-      if (results.length === 0) {
-        return [
-          {
-            activityId: activity.id,
-            name: player.nick,
-            rank: player.rank ?? "",
-            found: false,
-            ip: null,
-            password: null,
-            salt: null,
-            serverip: null,
-            servername: null,
-          },
-        ];
-      }
-
-      return results.map((result) => ({
-        activityId: activity.id,
-        name: player.nick,
-        rank: player.rank ?? "",
-        found: true,
-        ip: result.ip ?? null,
-        password: result.password ?? null,
-        salt: result.salt ?? null,
-        serverip: result.serverip ?? null,
-        servername: result.server ?? null,
-      }));
-    });
-
-    await prisma.activityLastFoundPlayers.createMany({
-      data: activityFoundPlayers,
-    });
+    await modRepository.createLastFoundPlayers(
+      activity.id,
+      buildFoundPlayerFields(data.players, mcResults),
+    );
   }
 
   // 5. Servidor del usuario
-  const existUserServer = await prisma.servers.findFirst({
-    where: {
+  const userServer = await modRepository.findServerByUserAndName(
+    userId,
+    data.server,
+  );
+
+  if (!userServer) {
+    await modRepository.createServerWithPlayers(
       userId,
-      name: data.server,
-    },
-  });
-
-  if (!existUserServer) {
-    await prisma.servers.create({
-      data: {
-        userId,
-        name: data.server,
-        ip: data.server,
-        port: 25565,
-        players: {
-          create: data.players.map((player) => {
-            const results = mcResults.get(player.nick) ?? [];
-            const found = results[0];
-
-            return {
-              name: player.nick,
-              rank: player.rank ?? null,
-              found: Boolean(found),
-              ip: found?.ip ?? null,
-              password: found?.password ?? null,
-              salt: found?.salt ?? null,
-              serverip: found?.serverip ?? null,
-              servername: found?.server ?? null,
-            };
-          }),
-        },
-      },
-    });
+      data.server,
+      buildPlayerFields(data.players, mcResults),
+    );
 
     return { message: "Datos enviados" };
   }
 
   // 6. Guardar solo jugadores nuevos en el servidor existente
-  const existingPlayers = await prisma.playerServers.findMany({
-    where: {
-      serverId: existUserServer.id,
-      server: { userId },
-    },
-    select: { name: true },
-  });
-
-  const existingNames = new Set(
-    existingPlayers.map((player) => player.name)
+  const existingPlayers = await modRepository.listServerPlayerNames(
+    userServer.id,
+    userId,
   );
+  const existingNames = new Set(existingPlayers.map((player) => player.name));
 
   const playersToCreate = data.players.filter(
-    (player) => !existingNames.has(player.nick)
+    (player) => !existingNames.has(player.nick),
   );
 
   if (playersToCreate.length > 0) {
-    await prisma.playerServers.createMany({
-      data: playersToCreate.map((player) => {
-        const results = mcResults.get(player.nick) ?? [];
-        const found = results[0];
-
-        return {
-          serverId: existUserServer.id,
-          name: player.nick,
-          rank: player.rank ?? null,
-          found: Boolean(found),
-          ip: found?.ip ?? null,
-          password: found?.password ?? null,
-          salt: found?.salt ?? null,
-          serverip: found?.serverip ?? null,
-          servername: found?.server ?? null,
-        };
-      }),
-    });
+    await modRepository.createServerPlayers(
+      userServer.id,
+      buildPlayerFields(playersToCreate, mcResults),
+    );
   }
 
   return { message: "Datos enviados" };
 }
 
-
 export async function configurated(userId: number) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { modConfigurated: true },
-  });
+  return modRepository.findUserModConfigurated(userId);
+}
 
-  return user?.modConfigurated ?? false;
+export async function configureMod(userId: number) {
+  return modRepository.configureMod(userId);
 }
 
 export async function actualServer(userId: number) {
-  const activity = await prisma.activity.findFirst({
-    where: { userId },
-    include: {
-      lastPlayers: true,
-    },
-  });
-
-  return activity;
+  return modRepository.findActivityWithLastPlayers(userId);
 }
 
 export async function infoName(name: string) {
-  const rows = await mcDb.query(
-    `SELECT name, ip, password, salt, serverip, server
-     FROM usuarios
-     WHERE name = :name
-     LIMIT 1`,
-    {
-      replacements: { name },
-      type: QueryTypes.SELECT,
-    }
-  );
-
-  const user = rows[0] as McUser | undefined;
-
-  return user ?? null;
+  return modRepository.findMcUserByName(name);
 }
-
