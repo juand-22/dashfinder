@@ -1,7 +1,4 @@
-export type MinecraftProfile = {
-  id: string;
-  name: string;
-};
+import type { MinecraftProfile } from "../types";
 
 export class MinecraftProfileRequestError extends Error {
   constructor(message: string) {

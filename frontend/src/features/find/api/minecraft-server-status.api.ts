@@ -1,12 +1,4 @@
-export type MinecraftServerStatus = {
-  online: boolean;
-  host: string;
-  port: number;
-  players: { online: number; max: number } | null;
-  motd: string;
-  icon: string | null;
-  version: string | null;
-};
+import type { MinecraftServerStatus } from "../types";
 
 export class MinecraftServerStatusRequestError extends Error {
   constructor(message: string) {

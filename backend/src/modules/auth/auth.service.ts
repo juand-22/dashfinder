@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../../lib/prisma";
 import env  from "../../config/env";
 import type { LoginInput, RegisterInput } from "./auth.schema";
+import { generateApiKey } from "../../utils/apiKey";
 
 export async function register(data: RegisterInput) {
   const username = data.username.toLowerCase().trim();
@@ -20,7 +21,8 @@ export async function register(data: RegisterInput) {
   const newUser = await prisma.user.create({
     data: {
       username,
-      password: hashedPassword
+      password: hashedPassword,
+      key: generateApiKey()
     },
     select: {
       id: true,

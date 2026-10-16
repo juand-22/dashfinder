@@ -1,7 +1,4 @@
-export type IpCountry = {
-  countryCode: string;
-  country: string;
-};
+import type { IpCountry } from "../types";
 
 export class IpCountryRequestError extends Error {
   constructor(message: string) {

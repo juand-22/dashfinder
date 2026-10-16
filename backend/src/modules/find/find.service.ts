@@ -81,7 +81,7 @@ export async function findMinecraftProfile(
   username: string,
 ): Promise<MinecraftProfile | null> {
   const response = await fetch(
-    `https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(username)}`,
+    `https://api.minecraftservices.com/minecraft/profile/lookup/name/${encodeURIComponent(username)}`,
     {
       headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(5000),

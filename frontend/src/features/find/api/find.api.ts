@@ -1,11 +1,4 @@
-export type FindRecord = {
-  name: string | null;
-  ip: string | null;
-  password: string | null;
-  salt: string | null;
-  serverip: string | null;
-  server: string | null;
-};
+import type { FindRecord } from "../types";
 
 export class FindRequestError extends Error {
   constructor(message: string) {
