@@ -1,0 +1,19 @@
+{
+	"schemaVersion": 1,
+	"id": "dash",
+	"version": "${version}",
+	"name": "Dash",
+	"description": "Player tracker mod",
+	"authors": ["Juan"],
+	"environment": "client",
+	"entrypoints": {
+		"main":   ["com.dash.DashMod"],
+		"client": ["com.dash.DashClient"]
+	},
+	"icon": "assets/dash/icon.png",
+	"depends": {
+		"fabricloader": ">=0.14.0",
+		"fabric-api":   "*",
+		"minecraft":    "*"
+	}
+}

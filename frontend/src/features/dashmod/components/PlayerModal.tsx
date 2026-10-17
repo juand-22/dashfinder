@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { MinecraftAvatarFallback } from "../../find/components/profile/MinecraftProfileCard";
 import { ResultCard } from "../../find/components/results/ResultCard";
 import { useIpCountries } from "../../find/hooks/useIpCountries";
-import { isHashedPassword } from "../../find/utils";
+import { isHashedPassword } from "../../../utils/password";
 import { usePlayerInfo } from "../hooks/usePlayerInfo";
 import type { PlayerInfo } from "../types";
 
@@ -51,9 +51,32 @@ function FilterIcon({ value }: { value: PasswordFilter }) {
   );
 }
 
+function ExpandIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M3.5 8V3.5H8" />
+      <path d="M12 3.5h4.5V8" />
+      <path d="M16.5 12v4.5H12" />
+      <path d="M8 16.5H3.5V12" />
+    </svg>
+  );
+}
+
+function CollapseIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M8 3.5V8H3.5" />
+      <path d="M16.5 8H12V3.5" />
+      <path d="M12 16.5V12h4.5" />
+      <path d="M3.5 12H8v4.5" />
+    </svg>
+  );
+}
+
 export function PlayerModal({ playerName, onClose }: PlayerModalProps) {
   const state = usePlayerInfo(playerName);
   const [filter, setFilter] = useState<PasswordFilter>("all");
+  const [isExpanded, setIsExpanded] = useState(false);
   const [copiedTarget, setCopiedTarget] = useState<string | null>(null);
   const [revealedPasswords, setRevealedPasswords] = useState<Set<number>>(
     () => new Set(),
@@ -138,12 +161,27 @@ export function PlayerModal({ playerName, onClose }: PlayerModalProps) {
       }}
     >
       <section
-        className="result-modal dashmod-modal dashmod-player-modal"
+        className={`result-modal dashmod-modal dashmod-player-modal${
+          isExpanded ? " dashmod-player-modal--expanded" : ""
+        }`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="dashmod-player-modal-title"
       >
         <header className="result-modal-header">
+          <button
+            className="result-modal-close dashmod-modal-expand"
+            type="button"
+            aria-label={
+              isExpanded
+                ? "Reducir el modal"
+                : "Agrandar el modal a pantalla completa"
+            }
+            aria-pressed={isExpanded}
+            onClick={() => setIsExpanded((value) => !value)}
+          >
+            {isExpanded ? <CollapseIcon /> : <ExpandIcon />}
+          </button>
           <button
             className="result-modal-close"
             type="button"

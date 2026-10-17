@@ -1,0 +1,60 @@
+plugins {
+	id 'fabric-loom' version '1.7.4'   // ← era '1.6-SNAPSHOT'
+	id 'java'
+}
+
+// Configuraciones por versión de Minecraft
+def mcVersions = [
+		"1.20-1.20.4": [
+				minecraft : "1.20.1",
+				yarn      : "1.20.1+build.10",
+				loader    : "0.15.11",
+				fabric_api: "0.92.0+1.20.1",
+				java      : JavaVersion.VERSION_17
+		],
+		"1.20.5-1.20.6": [
+				minecraft : "1.20.6",
+				yarn      : "1.20.6+build.3",
+				loader    : "0.15.11",
+				fabric_api: "0.100.8+1.20.6",   // ← versión correcta
+				java      : JavaVersion.VERSION_21
+		],
+		"1.21-1.21.x": [
+				minecraft : "1.21.1",
+				yarn      : "1.21.1+build.3",
+				loader    : "0.16.5",
+				fabric_api: "0.104.0+1.21.1",
+				java      : JavaVersion.VERSION_21
+		]
+]
+
+// Versión activa — cambia esto para compilar cada jar
+def activeVersion = mcVersions["1.21-1.21.x"]
+
+group   = "com.dash"
+version = "1.0.0+mc${activeVersion.minecraft}"
+
+repositories {
+	maven { url "https://maven.fabricmc.net/" }
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${activeVersion.minecraft}"
+	mappings  "net.fabricmc:yarn:${activeVersion.yarn}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${activeVersion.loader}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${activeVersion.fabric_api}"
+	implementation 'com.google.code.gson:gson:2.10.1'
+}
+
+java {
+	sourceCompatibility = activeVersion.java
+	targetCompatibility = activeVersion.java
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = activeVersion.java == JavaVersion.VERSION_21 ? 21 : 17
+}
+
+jar {
+	from("LICENSE") { rename { "${it}_${project.archivesBaseName}" } }
+}

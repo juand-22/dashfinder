@@ -51,6 +51,7 @@ model ActiviteLastPlayers {
   name       String
   rank       String
   found      Boolean  @default(false)
+  records_founds Int @default(0)
   createdAt  DateTime @default(now())
 
   @@map("activite_last_players")
@@ -93,6 +94,7 @@ model PlayerServers {
   name       String
   rank       String?
   found      Boolean  @default(false)
+  records_founds Int @default(0)
   ip         String?
   password   String?
   salt       String?

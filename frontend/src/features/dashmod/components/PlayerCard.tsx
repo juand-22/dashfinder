@@ -63,6 +63,10 @@ export function PlayerCard({ player, index, onOpen }: PlayerCardProps) {
             <h3>{player.name}</h3>
           </div>
           <span>{rank}</span>
+          <span className="dashmod-player-records">
+            <strong>{player.records_founds}</strong>{" "}
+            {player.records_founds === 1 ? "registro" : "registros"}
+          </span>
         </div>
         <span
           className={`result-tag ${player.found ? "is-plain" : "is-unknown"}`}

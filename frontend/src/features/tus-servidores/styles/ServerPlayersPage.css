@@ -1,0 +1,254 @@
+.servers-players {
+  display: grid;
+  gap: 24px;
+}
+
+.servers-back {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px 8px 10px;
+  border: 1px solid rgb(255 255 255 / 9%);
+  border-radius: 9px;
+  color: var(--color-text-soft);
+  background: rgb(255 255 255 / 4%);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease,
+    transform 160ms ease;
+}
+
+.servers-back:hover {
+  border-color: rgb(255 52 72 / 32%);
+  color: #fff;
+  background: rgb(255 52 72 / 9%);
+  transform: translateY(-1px);
+}
+
+.servers-back:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.servers-back svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.servers-status-panel {
+  padding: 18px 20px 20px;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 13px;
+  background: linear-gradient(155deg, #1b191b 0%, #151315 58%, #111012 100%)
+    padding-box;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 18%);
+}
+
+.servers-status-panel--interactive {
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.servers-status-panel--interactive:hover {
+  border-color: rgb(255 52 72 / 30%);
+  box-shadow: 0 16px 38px rgb(0 0 0 / 26%);
+  transform: translateY(-1px);
+}
+
+.servers-status-panel--interactive:active {
+  transform: translateY(0) scale(0.995);
+}
+
+.servers-status-panel--interactive:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 4px;
+}
+
+.servers-status-more {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 14px;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  transition: color 160ms ease;
+}
+
+.servers-status-more svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+  transition: transform 160ms ease;
+}
+
+.servers-status-panel--interactive:hover .servers-status-more {
+  color: #fff;
+}
+
+.servers-status-panel--interactive:hover .servers-status-more svg {
+  transform: translateX(2px);
+}
+
+.servers-modal {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.servers-modal .result-modal-header {
+  flex: 0 0 auto;
+}
+
+.servers-modal .minecraft-profile-modal-details {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 18px 12px 8px;
+  overscroll-behavior: contain;
+  scrollbar-color: rgb(255 255 255 / 16%) transparent;
+  scrollbar-width: thin;
+}
+
+.servers-modal .minecraft-profile-modal-details::-webkit-scrollbar {
+  width: 12px;
+}
+
+.servers-modal .minecraft-profile-modal-details::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.servers-modal .minecraft-profile-modal-details::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 14%);
+  background-clip: padding-box;
+}
+
+.result-modal.servers-server-modal {
+  width: min(100%, 700px);
+}
+
+.servers-server-modal .minecraft-server-status {
+  margin-top: 18px;
+}
+
+.servers-server-modal .server-status-icon {
+  display: none;
+}
+
+.servers-modal-avatar-letter {
+  color: #e3c39a;
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -2px;
+  text-shadow: 0 4px 18px rgb(194 148 91 / 30%);
+}
+
+.servers-players-list {
+  display: block;
+}
+
+.servers-players-grid {
+  animation: servers-players-rise 320ms ease both;
+}
+
+.servers-player-card {
+  display: block;
+  padding-bottom: 20px;
+  border-color: rgb(255 255 255 / 8%);
+  background: linear-gradient(155deg, #1b191b 0%, #151315 58%, #111012 100%)
+    padding-box;
+  animation: servers-player-card-in 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.servers-player-card .result-card-header {
+  align-items: center;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.servers-player-card .server-details {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.servers-player-card .server-details h3 {
+  margin: 0;
+}
+
+.servers-player-card .server-avatar {
+  overflow: hidden;
+}
+
+.servers-player-card .server-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.servers-player-card .servers-player-records {
+  color: rgb(255 255 255 / 42%);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.servers-player-card .servers-player-records strong {
+  color: rgb(255 255 255 / 58%);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@keyframes servers-players-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes servers-player-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .servers-status-panel {
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .servers-back,
+  .servers-players-grid,
+  .servers-player-card,
+  .servers-status-panel--interactive,
+  .servers-status-more,
+  .servers-status-more svg {
+    animation: none !important;
+    transition: none !important;
+  }
+}

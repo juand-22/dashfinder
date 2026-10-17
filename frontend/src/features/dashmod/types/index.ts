@@ -2,6 +2,7 @@ export type ModPlayer = {
   name: string;
   rank: string | null;
   found: boolean;
+  records_founds: number;
 };
 
 export type ModActivity = {

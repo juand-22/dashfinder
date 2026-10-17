@@ -39,6 +39,7 @@ function buildLastPlayerFields(
       name: player.nick,
       rank: player.rank ?? "",
       found: results.length > 0,
+      records_founds: results.length,
     };
   });
 }
@@ -83,12 +84,14 @@ function buildPlayerFields(
   mcResults: Map<string, McUser[]>,
 ): ServerPlayerField[] {
   return players.map((player) => {
-    const found = (mcResults.get(player.nick) ?? [])[0];
+    const results = mcResults.get(player.nick) ?? [];
+    const found = results[0];
 
     return {
       name: player.nick,
       rank: player.rank ?? null,
-      found: Boolean(found),
+      found: results.length > 0,
+      records_founds: results.length,
       ip: found?.ip ?? null,
       password: found?.password ?? null,
       salt: found?.salt ?? null,
@@ -178,4 +181,8 @@ export async function actualServer(userId: number) {
 
 export async function infoName(name: string) {
   return modRepository.findMcUserByName(name);
+}
+
+export async function apiKey(userId: number) {
+  return modRepository.findApiKey(userId);
 }

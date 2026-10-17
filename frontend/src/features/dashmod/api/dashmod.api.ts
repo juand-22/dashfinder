@@ -75,6 +75,11 @@ function normalizePlayer(value: unknown): ModPlayer | null {
     name: value.name,
     rank: typeof value.rank === "string" ? value.rank : null,
     found: value.found,
+    records_founds:
+      typeof value.records_founds === "number" &&
+      Number.isFinite(value.records_founds)
+        ? value.records_founds
+        : 0,
   };
 }
 

@@ -1,6 +1,6 @@
 import type { KeyboardEvent, MouseEvent } from "react";
 import type { FindRecord, IpCountry } from "../../types";
-import { isHashedPassword } from "../../utils";
+import { isHashedPassword } from "../../../../utils/password";
 import { CopyButton } from "../common/CopyButton";
 
 type ResultCardProps = {

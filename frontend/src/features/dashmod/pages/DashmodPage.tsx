@@ -12,7 +12,7 @@ import { ServerSummary } from "../components/ServerSummary";
 import { useModStatus } from "../hooks/useModStatus";
 import { useNow } from "../hooks/useNow";
 import type { ModPlayer } from "../types";
-import { stripServerPort } from "../utils";
+import { stripServerPort } from "../../../utils/server-address";
 import "../styles/DashmodPage.css";
 
 export function DashmodPage() {

@@ -1,0 +1,456 @@
+.configuracion {
+  display: grid;
+  gap: 24px;
+}
+
+.configuracion-heading {
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.configuracion-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid rgb(255 255 255 / 9%);
+  border-radius: 9px;
+  color: var(--color-text-soft);
+  background: rgb(255 255 255 / 4%);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease,
+    transform 160ms ease, box-shadow 160ms ease;
+}
+
+.configuracion-refresh:hover:not(:disabled) {
+  border-color: rgb(255 52 72 / 32%);
+  color: #fff;
+  background: rgb(255 52 72 / 9%);
+  box-shadow: 0 6px 18px rgb(227 35 57 / 14%);
+  transform: translateY(-1px);
+}
+
+.configuracion-refresh:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+}
+
+.configuracion-refresh:disabled {
+  cursor: progress;
+}
+
+.configuracion-refresh svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.configuracion-refresh.is-refreshing {
+  color: #fff;
+  border-color: rgb(255 52 72 / 34%);
+  background: rgb(255 52 72 / 12%);
+}
+
+.configuracion-refresh.is-refreshing svg {
+  animation: configuracion-spin 750ms linear infinite;
+}
+
+.config-feedback {
+  min-height: 200px;
+}
+
+.config-feedback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 28px;
+}
+
+.config-column {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.config-card {
+  border-color: rgb(255 255 255 / 8%);
+  background: linear-gradient(155deg, #1b191b 0%, #151315 58%, #111012 100%)
+    padding-box;
+  /* backwards y no both: al terminar la animación libera el transform para el hover. */
+  animation: config-card-in 440ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.config-card--interactive {
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.config-card--interactive:hover {
+  border-color: rgb(255 52 72 / 30%);
+  box-shadow: 0 16px 38px rgb(0 0 0 / 26%);
+  transform: translateY(-1px);
+}
+
+.config-card--interactive:active {
+  transform: translateY(0) scale(0.995);
+}
+
+.config-card--interactive:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 4px;
+}
+
+.config-card-more {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 14px;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  transition: color 160ms ease;
+}
+
+.config-card-more svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+  transition: transform 160ms ease;
+}
+
+.config-card--interactive:hover .config-card-more {
+  color: #fff;
+}
+
+.config-card--interactive:hover .config-card-more svg {
+  transform: translateX(2px);
+}
+
+.config-avatar svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+.config-fields {
+  margin-top: 7px;
+}
+
+.config-key-value {
+  flex: 1 1 auto;
+  justify-content: flex-end;
+}
+
+.config-key {
+  overflow: hidden;
+  min-width: 0;
+  flex: 0 1 auto;
+  color: var(--color-text-soft);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+}
+
+.config-key-missing {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.config-reveal {
+  flex: 0 0 auto;
+  padding: 4px 9px;
+  border: 1px solid rgb(255 255 255 / 9%);
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  background: rgb(255 255 255 / 4%);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.config-reveal:hover {
+  border-color: rgb(255 52 72 / 32%);
+  color: #fff;
+  background: rgb(255 52 72 / 9%);
+}
+
+.config-note {
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid rgb(255 255 255 / 6%);
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.config-error {
+  margin: 10px 0 0;
+  color: #ff9aa3;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.config-command-list {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.config-command-item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border: 1px solid rgb(255 255 255 / 6%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 2%);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.config-command-item:hover {
+  border-color: rgb(255 52 72 / 18%);
+  background: rgb(255 52 72 / 5%);
+}
+
+.config-command-info {
+  display: grid;
+  overflow: hidden;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 3px;
+}
+
+.config-command-info > code {
+  overflow: hidden;
+  color: var(--color-text-soft);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.config-command-info > span {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.config-steps {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.config-step {
+  display: flex;
+  min-width: 0;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgb(255 255 255 / 6%);
+  border-radius: 11px;
+  background: rgb(255 255 255 / 2%);
+}
+
+.config-step-index {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgb(255 52 72 / 24%);
+  border-radius: 50%;
+  color: #ff929d;
+  background: rgb(255 52 72 / 9%);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.config-step-body {
+  min-width: 0;
+}
+
+.config-step-body strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.config-step-body p {
+  max-width: 74ch;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.config-step-body em {
+  color: var(--color-text-soft);
+  font-style: normal;
+  font-weight: 600;
+}
+
+.config-step-body code,
+.config-step-hint code {
+  padding: 2px 6px;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 5px;
+  color: var(--color-text-soft);
+  background: rgb(255 255 255 / 4%);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+}
+
+.config-download {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 13px;
+}
+
+.config-download-button {
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 12px;
+}
+
+.config-download-note {
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+.config-command {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 11px;
+  padding: 9px 11px;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 9px;
+  background: #0e0c0e;
+}
+
+.config-command code {
+  overflow: hidden;
+  min-width: 0;
+  flex: 1 1 auto;
+  color: var(--color-text-soft);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.config-step-hint {
+  margin-top: 10px;
+}
+
+/* Modal de detalle de las cards. */
+.result-modal.config-modal {
+  width: min(100%, 620px);
+}
+
+.config-modal .result-modal-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 20px;
+  color: #d7a667;
+}
+
+.config-modal .result-modal-avatar svg {
+  width: 66px;
+  height: 66px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.3;
+}
+
+.config-modal .preview-disclaimer code {
+  padding: 1px 5px;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 5px;
+  color: var(--color-text-soft);
+  background: rgb(255 255 255 / 4%);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+}
+
+@keyframes configuracion-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes config-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (min-width: 1080px) {
+  .config-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .configuracion-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .config-step {
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .configuracion-refresh,
+  .configuracion-refresh svg,
+  .config-card,
+  .config-card-more svg {
+    animation: none !important;
+    transition: none !important;
+  }
+}

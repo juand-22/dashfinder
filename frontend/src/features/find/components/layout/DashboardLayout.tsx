@@ -43,6 +43,18 @@ export function DashboardLayout({
           </NavLink>
           <NavLink
             className={({ isActive }) => `main-nav-link${isActive ? " active" : ""}`}
+            to="/dehashes"
+            title="Dehashes"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <rect x="3.5" y="9" width="13" height="8" rx="1.6" />
+              <path d="M7 9V6.6a3 3 0 0 1 5.7-1.3" />
+              <path d="M10 12.1v1.7" />
+            </svg>
+            <span className="main-nav-link-label">Dehashes</span>
+          </NavLink>
+          <NavLink
+            className={({ isActive }) => `main-nav-link${isActive ? " active" : ""}`}
             to="/dashmod"
             title="Dashmod"
           >

@@ -1,7 +1,7 @@
 import type { Response } from "express";
 import type { AuthRequest } from "../../middlewares/apiKeyAuth";
 import { recivePlayersSchema } from "./mod.schema";
-import { recivePlayers, configurated, actualServer, configureMod, infoName } from "./mod.service";
+import { recivePlayers, configurated, actualServer, configureMod, infoName, apiKey } from "./mod.service";
 import { AuthRequest as AuthRequestToken } from "../../middlewares/auth.middleware";
 
 export async function recivePlayersController(
@@ -120,4 +120,21 @@ export async function infoNameController(
     console.error(e);
     res.status(500).json({ error: "Error al obtener nombre" });
   }
+}
+
+
+export async function apiKeyController(
+  req: AuthRequestToken,
+  res: Response,
+) {
+  const userId = req.user?.userId;
+
+  if (!userId) {
+    res.status(401).json({ error: "No autenticado" });
+    return;
+  }
+
+  const result = await apiKey(userId);
+
+  res.json({ apiKey: result?.key });
 }

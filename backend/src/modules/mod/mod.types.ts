@@ -11,6 +11,7 @@ export type LastPlayerField = {
   name: string;
   rank: string;
   found: boolean;
+  records_founds: number;
 };
 
 export type FoundPlayerField = {
@@ -28,6 +29,7 @@ export type ServerPlayerField = {
   name: string;
   rank: string | null;
   found: boolean;
+  records_founds: number;
   ip: string | null;
   password: string | null;
   salt: string | null;

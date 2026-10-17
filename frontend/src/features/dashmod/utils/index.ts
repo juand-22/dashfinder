@@ -1,18 +1,5 @@
 export const CONNECTED_WINDOW_MS = 3 * 60 * 1000;
 
-export function stripServerPort(address: string) {
-  const trimmed = address.trim();
-  if (!trimmed) return "";
-
-  const bracketed = trimmed.match(/^\[([^\]]+)\](?::\d+)?$/);
-  if (bracketed) return bracketed[1];
-
-  const hostWithPort = trimmed.match(/^([^:]+):\d+$/);
-  if (hostWithPort) return hostWithPort[1];
-
-  return trimmed;
-}
-
 export function isServerConnected(
   lastDateRequest: string | null | undefined,
   now: number,

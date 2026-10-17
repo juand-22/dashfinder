@@ -145,19 +145,26 @@ export async function findUserModConfigurated(userId: number) {
 export async function configureMod(userId: number) {
   const updated = await prisma.user.update({
     where: { id: userId },
-    data: { modConfigurated: true, },
+    data: { modConfigurated: true },
+    select: { username: true },
   });
 
-  return { message: "Mod configurado" };
-
+  return { message: "Mod configurado", username: updated.username };
 }
 
-export function findActivityWithLastPlayers(userId: number) {
+export async function findActivityWithLastPlayers(userId: number) {
   return prisma.activity.findFirst({
     where: { userId },
     omit: { id: true, userId: true, createdAt: true },
     include: { lastPlayers: {
-      select: { name: true, rank: true, found: true },
+      select: { name: true, rank: true, found: true, records_founds: true },
     }},
+  });
+}
+
+export async function findApiKey(userId: number) {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: { key: true },
   });
 }

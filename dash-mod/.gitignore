@@ -1,0 +1,54 @@
+# builds locales (los jars de build-all.bat)
+
+output/
+
+# gradle
+
+.gradle/
+build/
+out/
+classes/
+local.properties
+
+# eclipse
+
+*.launch
+
+# idea
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# vscode
+
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+
+# macos
+
+*.DS_Store
+
+# windows
+
+Thumbs.db
+desktop.ini
+
+# fabric
+
+run/
+
+# logs
+
+*.log
+
+# java
+
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
