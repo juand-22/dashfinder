@@ -1,3 +1,9 @@
+# entorno local (no se versiona)
+
+.env
+.env.*
+!.env.example
+
 # builds locales (los jars de build-all.bat)
 
 output/

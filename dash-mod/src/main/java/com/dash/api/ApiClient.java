@@ -4,19 +4,37 @@ import com.dash.DashConfig;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Properties;
 
 public final class ApiClient {
 
-    public static final String BASE_URL = "http://localhost:3000/api";
+    public static final String BASE_URL = loadBaseUrl();
 
     private static final String API_KEY_HEADER = "x-api-key";
     private static final HttpClient HTTP = HttpClient.newHttpClient();
 
     private ApiClient() {}
+
+    private static String loadBaseUrl() {
+        try (InputStream stream = ApiClient.class.getResourceAsStream("/dash.properties")) {
+            if (stream != null) {
+                Properties properties = new Properties();
+                properties.load(stream);
+
+                String url = properties.getProperty("apiUrl", "").trim();
+
+                if (!url.isEmpty()) return url.replaceAll("/+$", "");
+            }
+        } catch (Exception ignored) {
+        }
+
+        return "http://localhost:3000/api";
+    }
 
     public static HttpResponse<String> post(String path, JsonObject body) throws Exception {
         return post(path, body, DashConfig.getInstance().apiKey);

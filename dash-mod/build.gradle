@@ -29,6 +29,33 @@ def mcVersions = [
 
 def activeVersion = mcVersions["1.21-1.21.x"]
 
+def dashEnv = [:]
+def dashEnvFile = file(".env")
+if (dashEnvFile.exists()) {
+	dashEnvFile.eachLine("UTF-8") { line ->
+		def trimmed = line.trim()
+		if (!trimmed || trimmed.startsWith("#") || !trimmed.contains("=")) return
+		def index = trimmed.indexOf("=")
+		def key = trimmed.substring(0, index).trim()
+		def value = trimmed.substring(index + 1).trim()
+		if (value.length() >= 2 && value.startsWith('"') && value.endsWith('"')
+				|| value.length() >= 2 && value.startsWith("'") && value.endsWith("'")) {
+			value = value.substring(1, value.length() - 1)
+		}
+		dashEnv[key] = value
+	}
+}
+
+def dashApiUrl = System.getenv("DASH_API_URL") ?: dashEnv["DASH_API_URL"] ?: "http://localhost:3000/api"
+
+processResources {
+	inputs.property("dashApiUrl", dashApiUrl)
+
+	filesMatching("dash.properties") {
+		expand(apiUrl: dashApiUrl)
+	}
+}
+
 group   = "com.dash"
 version = "1.0.0+mc${activeVersion.minecraft}"
 

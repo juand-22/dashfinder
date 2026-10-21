@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import re
 import shutil
 import sys
@@ -12,7 +13,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-WORDLIST_PATH = Path(__file__).resolve().parent / "wordlist.txt"
+from env_file import load_env
+
+load_env()
+
+WORDLIST_PATH = Path(
+    os.getenv("DEHASH_WORDLIST") or Path(__file__).resolve().parent / "wordlist.txt"
+)
 
 # Algoritmo según el largo del hash hexadecimal.
 HEX_ALGORITHMS: dict[int, tuple[str, ...]] = {

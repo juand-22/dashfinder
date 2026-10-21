@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 import argparse
+import os
 from dataclasses import asdict
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from dehasher import SALT_RECIPES, SUPPORTED_ALGORITHMS, DehashResult, dehash
+from env_file import load_env
+
+load_env()
 
 app = FastAPI(
     title="dehasher",
@@ -93,14 +97,20 @@ def dehash_hash(request: DehashRequest) -> DehashResponse:
 
 
 def main() -> None:
+    default_host = os.getenv("DEHASH_HOST", "127.0.0.1")
+    default_port = int(os.getenv("DEHASH_PORT", "8000"))
+
     parser = argparse.ArgumentParser(description="Levanta la API del dehasher.")
     parser.add_argument(
         "--host",
-        default="127.0.0.1",
-        help="interfaz donde escuchar (por defecto: 127.0.0.1, solo tu máquina)",
+        default=default_host,
+        help=f"interfaz donde escuchar (por defecto: {default_host})",
     )
     parser.add_argument(
-        "--port", type=int, default=8000, help="puerto (por defecto: 8000)"
+        "--port",
+        type=int,
+        default=default_port,
+        help=f"puerto (por defecto: {default_port})",
     )
     args = parser.parse_args()
 

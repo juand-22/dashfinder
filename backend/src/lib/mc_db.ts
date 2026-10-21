@@ -1,8 +1,9 @@
 import { Sequelize } from "sequelize";
+import env from "../config/env";
 
 export const mcDb = new Sequelize({
   dialect: "sqlite",
-  storage: "./mc_dbs.db",
+  storage: env.MC_DB,
   logging: false,
 });
 

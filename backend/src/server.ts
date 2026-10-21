@@ -1,9 +1,10 @@
 import "dotenv/config";
 import app from "./app";
+import env from "./config/env";
 import { mcDb } from "./lib/mc_db";
 import { sweepStaleDehashes } from "./modules/dehash/dehash.service";
 
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 
 
 async function query() {
