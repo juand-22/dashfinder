@@ -14,8 +14,9 @@ public class DashConfig {
             .getConfigDir()
             .resolve("dash.json");
 
-    /** API key de la cuenta (`df_...`), se configura con `/dash key <api-key>`. */
     public String apiKey = "";
+
+    public String activeNick = "";
 
     private static DashConfig instance;
 
@@ -57,21 +58,25 @@ public class DashConfig {
         return isValidApiKey(getInstance().apiKey);
     }
 
-    /** Guarda la API key (la cuenta ya quedó verificada contra el backend). */
     public static void setApiKey(String apiKey) {
         getInstance().apiKey = apiKey;
         save();
     }
 
-    /** Borra la API key guardada: el mod queda desvinculado. */
     public static void unlink() {
         setApiKey("");
     }
 
-    /**
-     * Chequeo local para avisar de un error de tipeo antes de pegarle al backend
-     * (el backend igual la valida: 401 si no existe).
-     */
+    public static String getActiveNick() {
+        String nickname = getInstance().activeNick;
+        return nickname == null ? "" : nickname;
+    }
+
+    public static void setActiveNick(String nickname) {
+        getInstance().activeNick = nickname == null ? "" : nickname;
+        save();
+    }
+
     public static boolean isValidApiKey(String apiKey) {
         return apiKey != null && apiKey.startsWith("df_") && apiKey.length() > 10;
     }

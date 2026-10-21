@@ -23,8 +23,10 @@ model User {
   roleId          Int       @default(1)
   role            Role      @relation(fields: [roleId], references: [id])
   modConfigurated Boolean   @default(false)
+  modNicknames ModNicknames[]
   servers         Servers[]
   activity        Activity?
+  dehashResults   DehashResults[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @default(now()) @updatedAt
 
@@ -52,6 +54,7 @@ model ActiviteLastPlayers {
   rank       String
   found      Boolean  @default(false)
   records_founds Int @default(0)
+  hashedPassword Boolean @default(false)
   createdAt  DateTime @default(now())
 
   @@map("activite_last_players")
@@ -95,6 +98,7 @@ model PlayerServers {
   rank       String?
   found      Boolean  @default(false)
   records_founds Int @default(0)
+  hashedPassword Boolean @default(false)
   ip         String?
   password   String?
   salt       String?
@@ -104,4 +108,45 @@ model PlayerServers {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("player_servers")
+}
+
+model DehashResults {
+  id Int @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  hash String
+  name String?
+  cacheKey String @default("")
+  salt String?
+  algo String?
+  recipes String?
+  status String @default("DEHASHING")
+  result String?
+  error String?
+  algorithm String?
+  recipe String?
+  candidates Int?
+  elapsed Float?
+  tolerant Boolean @default(false)
+  missingPosition Int?
+  missingChar String?
+  cached Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([cacheKey])
+  @@index([userId, createdAt])
+  @@map("dehash_results")
+}
+
+
+model ModNicknames {
+  id Int @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  nickname String
+  found Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  @@map("mod_nicknames")
 }

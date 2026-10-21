@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import type { DehashFeedback } from "../../../dehashes/types";
 import type {
   FindRecord,
   IpCountry,
@@ -18,13 +19,13 @@ type ResultModalProps = {
   serverStatus: MinecraftServerStatusLookup | null;
   copiedTarget: string | null;
   ipCountry: IpCountry | null;
-  hashNotice: number | null;
+  dehashFeedback: DehashFeedback | null;
   isPasswordVisible: boolean;
   onAvatarError: () => void;
   onClose: () => void;
   onCopy: (value: string, target: string) => void;
   onTogglePassword: (index: number) => void;
-  onToggleHashNotice: (index: number) => void;
+  onDehash: (record: FindRecord, index: number) => void;
 };
 
 export function ResultModal({
@@ -36,13 +37,13 @@ export function ResultModal({
   serverStatus,
   copiedTarget,
   ipCountry,
-  hashNotice,
+  dehashFeedback,
   isPasswordVisible,
   onAvatarError,
   onClose,
   onCopy,
   onTogglePassword,
-  onToggleHashNotice,
+  onDehash,
 }: ResultModalProps) {
   if (typeof document === "undefined") return null;
   const title = record.name ?? record.server ?? "Resultado";
@@ -110,12 +111,14 @@ export function ResultModal({
             index={index}
             copiedTarget={copiedTarget}
             ipCountry={ipCountry}
-            hashNotice={hashNotice}
+            dehashFeedback={
+              dehashFeedback?.key === String(index) ? dehashFeedback : null
+            }
             isPasswordVisible={isPasswordVisible}
             isModal
             onCopy={onCopy}
             onTogglePassword={onTogglePassword}
-            onToggleHashNotice={onToggleHashNotice}
+            onDehash={onDehash}
           />
           {serverAddress && serverStatus && (
             <MinecraftServerStatusPanel record={record} status={serverStatus} />

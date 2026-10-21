@@ -35,10 +35,7 @@ export function authenticate(
   }
 }
 
-/**
- * Acepta la API key del mod (`x-api-key`) o la sesión del panel (cookie JWT).
- * El mod no tiene sesión, así que se identifica con la API key de su cuenta.
- */
+
 export async function authenticateOrApiKey(
   req: AuthRequest,
   res: Response,

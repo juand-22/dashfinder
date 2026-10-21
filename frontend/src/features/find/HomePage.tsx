@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useAuth } from "../auth/context/auth.context";
+import { useDehashSender } from "../dehashes/hooks/useDehashSender";
 import { FindRequestError, searchUsers } from "./api/find.api";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { MinecraftProfileCard } from "./components/profile/MinecraftProfileCard";
@@ -20,7 +21,8 @@ export function HomePage() {
   const [revealedPasswords, setRevealedPasswords] = useState<Set<number>>(
     () => new Set(),
   );
-  const [hashNotice, setHashNotice] = useState<number | null>(null);
+  const { feedback: dehashFeedback, send: dehash, clear: clearDehashFeedback } =
+    useDehashSender();
   const [hasSearched, setHasSearched] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +67,7 @@ export function HomePage() {
     setHasSearched(false);
     setResults([]);
     setRevealedPasswords(new Set());
-    setHashNotice(null);
+    clearDehashFeedback();
 
     try {
       const records = await searchUsers(searchTerm);
@@ -103,8 +105,8 @@ export function HomePage() {
     });
   }
 
-  function toggleHashNotice(index: number) {
-    setHashNotice((current) => (current === index ? null : index));
+  function dehashForCard(record: FindRecord, index: number) {
+    dehash(record, String(index));
   }
 
   function openResult(record: FindRecord, index: number, opener: HTMLElement) {
@@ -136,13 +138,13 @@ export function HomePage() {
         serverStatus={selectedServerStatus}
         copiedTarget={copiedTarget}
         ipCountry={record.ip ? ipCountries[record.ip] ?? null : null}
-        hashNotice={hashNotice}
+        dehashFeedback={dehashFeedback}
         isPasswordVisible={revealedPasswords.has(index)}
         onAvatarError={() => setModalAvatarFailed(true)}
         onClose={() => setSelectedResult(null)}
         onCopy={copyForCard}
         onTogglePassword={togglePassword}
-        onToggleHashNotice={toggleHashNotice}
+        onDehash={dehashForCard}
       />
     );
   }
@@ -184,11 +186,11 @@ export function HomePage() {
           results={results}
           ipCountries={ipCountries}
           copiedTarget={copiedTarget}
-          hashNotice={hashNotice}
+          dehashFeedback={dehashFeedback}
           revealedPasswords={revealedPasswords}
           onCopy={copyForCard}
           onTogglePassword={togglePassword}
-          onToggleHashNotice={toggleHashNotice}
+          onDehash={dehashForCard}
           onOpenResult={openResult}
         />
       )}

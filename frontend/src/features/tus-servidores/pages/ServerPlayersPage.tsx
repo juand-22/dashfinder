@@ -47,13 +47,13 @@ export function ServerPlayersPage() {
   const counts: Record<PlayerFilter, number> = {
     all: players.length,
     found: players.filter((player) => player.found).length,
-    "not-found": players.filter((player) => !player.found).length,
+    "not-hashed": players.filter((player) => player.hashedPassword).length,
   };
 
   const term = query.trim().toLowerCase();
   const visiblePlayers = players.filter((player) => {
     if (filter === "found" && !player.found) return false;
-    if (filter === "not-found" && player.found) return false;
+    if (filter === "not-hashed" && !player.hashedPassword) return false;
     if (term && !player.name.toLowerCase().includes(term)) return false;
     return true;
   });

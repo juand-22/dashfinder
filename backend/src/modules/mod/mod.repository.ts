@@ -10,7 +10,6 @@ import type {
 
 const MC_USER_COLUMNS = "name, ip, password, salt, serverip, server";
 
-/* ----------------------------- Base externa MC ---------------------------- */
 
 export async function findMcUsersByNick(nick: string): Promise<McUser[]> {
   const rows = await mcDb.query(
@@ -40,7 +39,6 @@ export async function findMcUserByName(name: string): Promise<McUser[]> {
   return rows as McUser[];
 }
 
-/* --------------------------------- Activity -------------------------------- */
 
 export function findActivityByUser(userId: number) {
   return prisma.activity.findUnique({ where: { userId } });
@@ -93,7 +91,6 @@ export function createLastFoundPlayers(
   });
 }
 
-/* --------------------------------- Servers --------------------------------- */
 
 export function findServerByUserAndName(userId: number, name: string) {
   return prisma.servers.findFirst({ where: { userId, name } });
@@ -131,7 +128,6 @@ export function createServerPlayers(
   });
 }
 
-/* ---------------------------------- User ----------------------------------- */
 
 export async function findUserModConfigurated(userId: number) {
   const user = await prisma.user.findUnique({
@@ -157,7 +153,7 @@ export async function findActivityWithLastPlayers(userId: number) {
     where: { userId },
     omit: { id: true, userId: true, createdAt: true },
     include: { lastPlayers: {
-      select: { name: true, rank: true, found: true, records_founds: true },
+      select: { name: true, rank: true, found: true, records_founds: true, hashedPassword: true },
     }},
   });
 }
@@ -167,4 +163,42 @@ export async function findApiKey(userId: number) {
     where: { id: userId },
     select: { key: true },
   });
+}
+
+
+const NICKNAME_COLUMNS = {
+  id: true,
+  nickname: true,
+  found: true,
+  createdAt: true,
+} as const;
+
+export function listNicknames(userId: number) {
+  return prisma.modNicknames.findMany({
+    where: { userId },
+    orderBy: { id: "desc" },
+    select: NICKNAME_COLUMNS,
+  });
+}
+
+export function findNickname(userId: number, nickname: string) {
+  return prisma.modNicknames.findFirst({
+    where: { userId, nickname },
+    select: { id: true },
+  });
+}
+
+export function createNickname(
+  userId: number,
+  nickname: string,
+  found: boolean,
+) {
+  return prisma.modNicknames.create({
+    data: { userId, nickname, found },
+    select: NICKNAME_COLUMNS,
+  });
+}
+
+export function deleteNickname(userId: number, id: number) {
+  return prisma.modNicknames.deleteMany({ where: { id, userId } });
 }

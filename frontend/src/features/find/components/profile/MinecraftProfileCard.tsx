@@ -1,4 +1,5 @@
 import type { KeyboardEvent, MouseEvent, RefObject } from "react";
+import { SaveNicknameRow } from "../../../mod-nicknames/components/SaveNicknameButton";
 import type { MinecraftProfileLookup } from "../../types";
 import { formatMinecraftUuid } from "../../utils";
 
@@ -45,6 +46,11 @@ export function MinecraftProfileCard({
             : "Escribe un nombre para ver su perfil";
 
   function openFromClick(event: MouseEvent<HTMLElement>) {
+    // El botón de guardar nick no abre la vista del perfil.
+    if (event.target instanceof Element && event.target.closest("button, a")) {
+      return;
+    }
+
     openerRef.current = event.currentTarget;
     onOpen();
   }
@@ -118,6 +124,8 @@ export function MinecraftProfileCard({
           Puede ser una cuenta Bedrock o un nombre que no existe.
         </p>
       )}
+
+      <SaveNicknameRow nickname={profile?.name ?? username} />
     </article>
   );
 }

@@ -263,8 +263,8 @@
   color: #8bd9ae;
 }
 
-.servers-stat.is-not-found strong {
-  color: #ff9aa3;
+.servers-stat.is-not-hashed strong {
+  color: #e3c39a;
 }
 
 @keyframes servers-spin {

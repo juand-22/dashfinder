@@ -3,6 +3,7 @@ export type ModPlayer = {
   rank: string | null;
   found: boolean;
   records_founds: number;
+  hashedPassword: boolean;
 };
 
 export type ModActivity = {
@@ -20,4 +21,4 @@ export type PlayerInfo = {
   server: string | null;
 };
 
-export type PlayerFilter = "all" | "found" | "not-found";
+export type PlayerFilter = "all" | "found" | "not-hashed";

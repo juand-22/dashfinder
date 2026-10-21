@@ -9,13 +9,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-/**
- * Cliente HTTP del mod: centraliza la URL del backend, el header de la API key
- * (el mod se identifica con `x-api-key`) y la lectura de respuestas.
- */
 public final class ApiClient {
 
-    /** Backend de Dash. */
     public static final String BASE_URL = "http://localhost:3000/api";
 
     private static final String API_KEY_HEADER = "x-api-key";
@@ -23,12 +18,10 @@ public final class ApiClient {
 
     private ApiClient() {}
 
-    /** POST autenticado con la API key guardada en la config. */
     public static HttpResponse<String> post(String path, JsonObject body) throws Exception {
         return post(path, body, DashConfig.getInstance().apiKey);
     }
 
-    /** POST autenticado con una API key puntual (para verificarla antes de guardarla). */
     public static HttpResponse<String> post(String path, JsonObject body, String apiKey) throws Exception {
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + path))
@@ -43,7 +36,23 @@ public final class ApiClient {
         return HTTP.send(request.build(), HttpResponse.BodyHandlers.ofString());
     }
 
-    /** Lee el `username` de la respuesta de `/mod/configure` (null si no vino). */
+    public static HttpResponse<String> get(String path) throws Exception {
+        return get(path, DashConfig.getInstance().apiKey);
+    }
+
+    public static HttpResponse<String> get(String path, String apiKey) throws Exception {
+        HttpRequest.Builder request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + path))
+                .header("User-Agent", "DashClient/1.0")
+                .GET();
+
+        if (apiKey != null && !apiKey.isBlank()) {
+            request.header(API_KEY_HEADER, apiKey);
+        }
+
+        return HTTP.send(request.build(), HttpResponse.BodyHandlers.ofString());
+    }
+
     public static String readUsername(String responseBody) {
         try {
             JsonObject json = JsonParser.parseString(responseBody).getAsJsonObject();

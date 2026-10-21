@@ -1,3 +1,4 @@
+import type { DehashFeedback } from "../../../dehashes/types";
 import type { FindRecord, IpCountry } from "../../types";
 import { ResultCard } from "./ResultCard";
 
@@ -6,11 +7,11 @@ type ResultsSectionProps = {
   results: FindRecord[];
   ipCountries: Record<string, IpCountry | null>;
   copiedTarget: string | null;
-  hashNotice: number | null;
+  dehashFeedback: DehashFeedback | null;
   revealedPasswords: Set<number>;
   onCopy: (value: string, target: string) => void;
   onTogglePassword: (index: number) => void;
-  onToggleHashNotice: (index: number) => void;
+  onDehash: (record: FindRecord, index: number) => void;
   onOpenResult: (record: FindRecord, index: number, opener: HTMLElement) => void;
 };
 
@@ -19,11 +20,11 @@ export function ResultsSection({
   results,
   ipCountries,
   copiedTarget,
-  hashNotice,
+  dehashFeedback,
   revealedPasswords,
   onCopy,
   onTogglePassword,
-  onToggleHashNotice,
+  onDehash,
   onOpenResult,
 }: ResultsSectionProps) {
   return (
@@ -43,7 +44,7 @@ export function ResultsSection({
       </div>
 
       {results.length > 0 ? (
-        <div className="results-grid">
+        <div className="results-grid home-results-grid">
           {results.map((record, index) => (
             <ResultCard
               key={`${record.name ?? "sin-usuario"}-${record.server ?? "Servidor desconocido"}-${record.ip ?? "sin-ip"}-${index}`}
@@ -51,11 +52,13 @@ export function ResultsSection({
               index={index}
               copiedTarget={copiedTarget}
               ipCountry={record.ip ? ipCountries[record.ip] ?? null : null}
-              hashNotice={hashNotice}
+              dehashFeedback={
+                dehashFeedback?.key === String(index) ? dehashFeedback : null
+              }
               isPasswordVisible={revealedPasswords.has(index)}
               onCopy={onCopy}
               onTogglePassword={onTogglePassword}
-              onToggleHashNotice={onToggleHashNotice}
+              onDehash={onDehash}
               onOpen={onOpenResult}
             />
           ))}

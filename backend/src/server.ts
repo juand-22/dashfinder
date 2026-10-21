@@ -1,6 +1,7 @@
 import "dotenv/config";
 import app from "./app";
 import { mcDb } from "./lib/mc_db";
+import { sweepStaleDehashes } from "./modules/dehash/dehash.service";
 
 const PORT = process.env.PORT || 3000;
 
@@ -25,4 +26,5 @@ query()
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  sweepStaleDehashes();
 });

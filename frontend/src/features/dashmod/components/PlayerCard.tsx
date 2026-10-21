@@ -5,6 +5,7 @@ import {
   type MouseEvent,
 } from "react";
 import type { ModPlayer } from "../types";
+import { SaveNicknameRow } from "../../mod-nicknames/components/SaveNicknameButton";
 
 type PlayerCardProps = {
   player: ModPlayer;
@@ -74,6 +75,7 @@ export function PlayerCard({ player, index, onOpen }: PlayerCardProps) {
           {player.found ? "Encontrado" : "No encontrado"}
         </span>
       </div>
+      <SaveNicknameRow nickname={player.name} />
     </article>
   );
 }

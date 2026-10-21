@@ -12,6 +12,7 @@ export type LastPlayerField = {
   rank: string;
   found: boolean;
   records_founds: number;
+  hashedPassword: boolean;
 };
 
 export type FoundPlayerField = {
@@ -30,6 +31,7 @@ export type ServerPlayerField = {
   rank: string | null;
   found: boolean;
   records_founds: number;
+  hashedPassword: boolean;
   ip: string | null;
   password: string | null;
   salt: string | null;

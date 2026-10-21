@@ -7,7 +7,12 @@ import com.mojang.authlib.GameProfile;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -41,7 +46,21 @@ public class DashClient implements ClientModInitializer {
         DashConfig.load();
         DashCommand.register();
 
-        // Conecta el scheduler con el envío real.
+        applySavedNick();
+
+        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+            if (!(screen instanceof MultiplayerScreen multiplayer)) return;
+
+            ButtonWidget button = ButtonWidget.builder(
+                            Text.literal("Dash nicknames"),
+                            clicked -> client.setScreen(new DashNicknamesScreen(multiplayer)))
+                    .dimensions(5, 5, 120, 20)
+                    .tooltip(Tooltip.of(Text.literal("Elegí el nick con el que entrar a los servidores")))
+                    .build();
+
+            Screens.getButtons(screen).add(button);
+        });
+
         DashScheduler.registerSendTask(() -> {
             MinecraftClient mc = MinecraftClient.getInstance();
             if (mc != null && isConnected && mc.world != null && DashConfig.isConfigured()) {
@@ -58,6 +77,15 @@ public class DashClient implements ClientModInitializer {
                 currentServer = "singleplayer";
             }
 
+            String activeNick = DashSession.activeNick();
+
+            if (activeNick != null) {
+                DashChat.send(Text.literal("Entrando como ")
+                        .formatted(Formatting.GRAY)
+                        .append(Text.literal(activeNick).formatted(Formatting.GREEN, Formatting.BOLD))
+                        .append(Text.literal(" (cambialo en Dash nicknames)").formatted(Formatting.GRAY)));
+            }
+
             if (!DashConfig.isConfigured()) {
                 DashChat.send(Text.literal("No vinculado. Usa ")
                         .formatted(Formatting.GRAY)
@@ -68,7 +96,6 @@ public class DashClient implements ClientModInitializer {
             DashMod.LOGGER.info("[Dash] Conectado a: " + currentServer);
             verifyAccount();
 
-            // Envío inicial al conectar — también reinicia el ciclo del scheduler.
             DashScheduler.sendNow();
         });
 
@@ -81,10 +108,19 @@ public class DashClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> DashScheduler.tick());
     }
 
-    /**
-     * Verifica la API key contra `POST /api/mod/configure` (y marca la cuenta
-     * como configurada). Si el backend ya no la reconoce, desvincula el mod.
-     */
+    private static void applySavedNick() {
+        String savedNick = DashConfig.getActiveNick();
+
+        if (savedNick.isEmpty()) return;
+
+        try {
+            DashSession.apply(savedNick);
+            DashMod.LOGGER.info("[Dash] Entrando como " + savedNick);
+        } catch (Exception e) {
+            DashMod.LOGGER.warn("[Dash] No se pudo aplicar el nick " + savedNick + ": " + e.getMessage());
+        }
+    }
+
     private static void verifyAccount() {
         CompletableFuture.runAsync(() -> {
             try {

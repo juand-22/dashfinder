@@ -43,14 +43,14 @@ function normalizeServer(value: unknown): ModServer | null {
   const port = readNumber(value.port);
   const playersTotal = readNumber(value.players_total);
   const playerFounds = readNumber(value.player_founds);
-  const playersNotFounds = readNumber(value.players_not_founds);
+  const playersNotHashed = readNumber(value.players_not_hashed);
 
   if (
     id === null ||
     port === null ||
     playersTotal === null ||
     playerFounds === null ||
-    playersNotFounds === null
+    playersNotHashed === null
   ) {
     return null;
   }
@@ -62,7 +62,7 @@ function normalizeServer(value: unknown): ModServer | null {
     port,
     players_total: playersTotal,
     player_founds: playerFounds,
-    players_not_founds: playersNotFounds,
+    players_not_hashed: playersNotHashed,
   };
 }
 
@@ -82,6 +82,7 @@ function normalizePlayer(value: unknown): ServerPlayer | null {
     rank: typeof value.rank === "string" ? value.rank : null,
     found: value.found === true,
     records_founds: recordsFounds,
+    hashedPassword: value.hashedPassword === true,
     servername: value.servername,
     serverip: value.serverip,
     serverport: serverPort,

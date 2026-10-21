@@ -1,5 +1,6 @@
+import { computeHashedPassword } from "../../lib/password";
 import * as modRepository from "./mod.repository";
-import type { RecivePlayersInput } from "./mod.schema";
+import type { NicknameBody, RecivePlayersInput } from "./mod.schema";
 import type {
   FoundPlayerField,
   LastPlayerField,
@@ -40,6 +41,7 @@ function buildLastPlayerFields(
       rank: player.rank ?? "",
       found: results.length > 0,
       records_founds: results.length,
+      hashedPassword: computeHashedPassword(results),
     };
   });
 }
@@ -92,6 +94,7 @@ function buildPlayerFields(
       rank: player.rank ?? null,
       found: results.length > 0,
       records_founds: results.length,
+      hashedPassword: computeHashedPassword(results),
       ip: found?.ip ?? null,
       password: found?.password ?? null,
       salt: found?.salt ?? null,
@@ -104,13 +107,10 @@ function buildPlayerFields(
 export async function recivePlayers(data: RecivePlayersInput, userId: number) {
   const now = new Date();
 
-  // 1. Crear o actualizar la última actividad del usuario
   const activity = await upsertActivity(userId, data.server, now);
 
-  // 2. Consultar cada nick en la base externa
   const mcResults = await collectMcResults(data.players);
 
-  // 3. Reemplazar los últimos jugadores enviados
   await modRepository.deleteLastPlayers(activity.id);
 
   if (data.players.length > 0) {
@@ -120,7 +120,6 @@ export async function recivePlayers(data: RecivePlayersInput, userId: number) {
     );
   }
 
-  // 4. Reemplazar los últimos jugadores encontrados
   await modRepository.deleteLastFoundPlayers(activity.id);
 
   if (data.players.length > 0) {
@@ -130,7 +129,6 @@ export async function recivePlayers(data: RecivePlayersInput, userId: number) {
     );
   }
 
-  // 5. Servidor del usuario
   const userServer = await modRepository.findServerByUserAndName(
     userId,
     data.server,
@@ -146,7 +144,6 @@ export async function recivePlayers(data: RecivePlayersInput, userId: number) {
     return { message: "Datos enviados" };
   }
 
-  // 6. Guardar solo jugadores nuevos en el servidor existente
   const existingPlayers = await modRepository.listServerPlayerNames(
     userServer.id,
     userId,
@@ -185,4 +182,29 @@ export async function infoName(name: string) {
 
 export async function apiKey(userId: number) {
   return modRepository.findApiKey(userId);
+}
+
+
+export async function listNicknames(userId: number) {
+  return modRepository.listNicknames(userId);
+}
+
+export async function createNickname(userId: number, input: NicknameBody) {
+  const yaGuardado = await modRepository.findNickname(userId, input.nickname);
+
+  if (yaGuardado) {
+    return null;
+  }
+
+  return modRepository.createNickname(
+    userId,
+    input.nickname,
+    input.found ?? false,
+  );
+}
+
+export async function deleteNickname(userId: number, id: number) {
+  const { count } = await modRepository.deleteNickname(userId, id);
+
+  return count > 0;
 }

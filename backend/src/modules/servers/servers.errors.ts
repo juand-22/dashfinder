@@ -25,6 +25,12 @@ export const ServersErrors = {
             400,
             "El id del servidor no es válido.",
         ),
+    invalidNickname: () =>
+        new ServersError(
+            "INVALID_NICKNAME",
+            400,
+            "Mandá el nick en `name`.",
+        ),
     serversNotFound: () =>
         new ServersError(
             "SERVERS_NOT_FOUND",

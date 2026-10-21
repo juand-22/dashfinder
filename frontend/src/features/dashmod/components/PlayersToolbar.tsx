@@ -3,7 +3,7 @@ import type { PlayerFilter } from "../types";
 const FILTERS: { value: PlayerFilter; label: string }[] = [
   { value: "all", label: "Todos" },
   { value: "found", label: "Encontrados" },
-  { value: "not-found", label: "No encontrados" },
+  { value: "not-hashed", label: "Sin hashear" },
 ];
 
 function FilterIcon({ value }: { value: PlayerFilter }) {
@@ -16,11 +16,11 @@ function FilterIcon({ value }: { value: PlayerFilter }) {
     );
   }
 
-  if (value === "not-found") {
+  if (value === "not-hashed") {
     return (
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <circle cx="8" cy="8" r="6.2" />
-        <path d="m5.7 5.7 4.6 4.6m0-4.6-4.6 4.6" />
+        <rect x="3.2" y="7" width="9.6" height="6.4" rx="1.7" />
+        <path d="M5.6 7V5.2a2.6 2.6 0 0 1 5.2 0" />
       </svg>
     );
   }

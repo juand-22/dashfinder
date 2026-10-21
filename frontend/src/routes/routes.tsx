@@ -7,6 +7,7 @@ import { DashmodPage } from "../features/dashmod/pages/DashmodPage";
 import { TusServidoresPage } from "../features/tus-servidores/pages/TusServidoresPage";
 import { ServerPlayersPage } from "../features/tus-servidores/pages/ServerPlayersPage";
 import { DehashesPage } from "../features/dehashes/pages/DehashesPage";
+import { ModNicknamesPage } from "../features/mod-nicknames/pages/ModNicknamesPage";
 import { ConfiguracionPage } from "../features/configuracion/pages/ConfiguracionPage";
 import { GuestOnly, RequireAuth } from "./AuthGuards";
 
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
                         path: "tus-servidores/:serverId",
                         element: <ServerPlayersPage />,
                     },
+                    { path: "mod-nicknames", element: <ModNicknamesPage /> },
                     { path: "dehashes", element: <DehashesPage /> },
                     { path: "configuracion", element: <ConfiguracionPage /> },
                 ],

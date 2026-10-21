@@ -22,7 +22,6 @@ public class DashCommand {
             dispatcher.register(
                     ClientCommandManager.literal("dash")
 
-                            // /dash key <api-key>
                             .then(ClientCommandManager.literal("key")
                                     .then(ClientCommandManager.argument("key", StringArgumentType.string())
                                             .executes(ctx -> {
@@ -53,7 +52,6 @@ public class DashCommand {
                                                                         .append(Text.literal(username != null ? username : "tu cuenta")
                                                                                 .formatted(Formatting.WHITE, Formatting.BOLD)));
 
-                                                                // Manda los jugadores al toque en vez de esperar el ciclo.
                                                                 DashScheduler.sendNow();
 
                                                             } else if (response.statusCode() == 401) {
@@ -79,7 +77,6 @@ public class DashCommand {
                                     )
                             )
 
-                            // /dash status
                             .then(ClientCommandManager.literal("status")
                                     .executes(ctx -> {
                                         if (DashConfig.isConfigured()) {
@@ -97,7 +94,6 @@ public class DashCommand {
                                     })
                             )
 
-                            // /dash clear
                             .then(ClientCommandManager.literal("clear")
                                     .executes(ctx -> {
                                         if (!DashConfig.isConfigured()) {
@@ -112,6 +108,13 @@ public class DashCommand {
                                         return 1;
                                     })
                             )
+
+                            .then(ClientCommandManager.literal("nicks")
+                                    .executes(ctx -> {
+                                        MinecraftClient.getInstance().setScreen(new DashNicknamesScreen(null));
+                                        return 1;
+                                    })
+                            )
             );
         });
     }
@@ -120,7 +123,6 @@ public class DashCommand {
         ctx.getSource().sendFeedback(DashChat.message(message));
     }
 
-    /** Muestra solo el comienzo de la key para no filtrarla en una captura. */
     private static String maskKey(String apiKey) {
         if (apiKey == null || apiKey.length() <= 11) return "—";
         return apiKey.substring(0, 11) + "…";

@@ -5,7 +5,7 @@ export type ModServer = {
   port: number;
   players_total: number;
   player_founds: number;
-  players_not_founds: number;
+  players_not_hashed: number;
 };
 
 export type ServerPlayer = {
@@ -13,6 +13,7 @@ export type ServerPlayer = {
   rank: string | null;
   found: boolean;
   records_founds: number;
+  hashedPassword: boolean;
   servername: string;
   serverip: string;
   serverport: number;

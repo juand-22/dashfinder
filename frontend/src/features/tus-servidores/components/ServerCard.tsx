@@ -41,9 +41,9 @@ export function ServerCard({ server, index }: ServerCardProps) {
           <strong>{numberFormat.format(server.player_founds)}</strong>
           <span>Encontrados</span>
         </div>
-        <div className="servers-stat is-not-found">
-          <strong>{numberFormat.format(server.players_not_founds)}</strong>
-          <span>Sin encontrar</span>
+        <div className="servers-stat is-not-hashed">
+          <strong>{numberFormat.format(server.players_not_hashed)}</strong>
+          <span>Sin hashear</span>
         </div>
       </div>
     </Link>

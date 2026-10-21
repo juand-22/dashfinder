@@ -1,0 +1,103 @@
+/**
+ * Botón «Guardar nickname»: aparece en las tarjetas de jugador del home, de
+ * dehashes, de dashmod y de tus servidores.
+ *
+ * Tiene estilo propio (no reusa las clases de cada tarjeta) para que se vea
+ * igual en todas y para no pisar los `:disabled` de cada sección.
+ */
+
+.nick-save {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid rgb(227 195 154 / 26%);
+  border-radius: 7px;
+  color: #e3c39a;
+  background: rgb(227 195 154 / 7%);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.nick-save svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+.nick-save:hover:not(:disabled) {
+  border-color: rgb(227 195 154 / 45%);
+  color: #f6dcb6;
+  background: rgb(227 195 154 / 14%);
+}
+
+.nick-save.is-saving:disabled {
+  cursor: progress;
+  animation: nick-save-pulse 1s ease-in-out infinite;
+}
+
+.nick-save.is-saved:disabled,
+.nick-save.is-saved:hover {
+  border-color: rgb(99 204 153 / 32%);
+  color: #8bd9ae;
+  background: rgb(71 169 116 / 10%);
+  cursor: default;
+}
+
+@keyframes nick-save-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Fila para las tarjetas sin fila de acciones propia. */
+
+.nick-save-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.nick-save-row.is-start {
+  justify-content: flex-start;
+}
+
+/* El aviso de error ocupa su propia línea dentro de la fila de acciones. */
+
+.nick-save-message {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.nick-save-message.is-error {
+  color: #ffabb2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nick-save {
+    transition: none;
+  }
+
+  .nick-save.is-saving:disabled {
+    animation: none;
+  }
+}

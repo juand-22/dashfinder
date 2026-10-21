@@ -5,6 +5,7 @@ import {
   type MouseEvent,
 } from "react";
 import type { ServerPlayer } from "../types";
+import { SaveNicknameRow } from "../../mod-nicknames/components/SaveNicknameButton";
 
 type ServerPlayerCardProps = {
   player: ServerPlayer;
@@ -26,6 +27,11 @@ export function ServerPlayerCard({
   } as CSSProperties;
 
   function handleClick(event: MouseEvent<HTMLElement>) {
+    // Los botones de la tarjeta (guardar nick) no abren el modal.
+    if (event.target instanceof Element && event.target.closest("button, a")) {
+      return;
+    }
+
     onOpen(player, event.currentTarget);
   }
 
@@ -78,6 +84,7 @@ export function ServerPlayerCard({
           {player.found ? "Encontrado" : "No encontrado"}
         </span>
       </div>
+      <SaveNicknameRow nickname={player.name} />
     </article>
   );
 }

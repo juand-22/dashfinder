@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { SaveNicknameRow } from "../../../mod-nicknames/components/SaveNicknameButton";
 import type { MinecraftProfileLookup } from "../../types";
 import { formatMinecraftUuid } from "../../utils";
 import { MinecraftAvatarFallback } from "./MinecraftProfileCard";
@@ -76,6 +77,10 @@ export function MinecraftProfileModal({
                 {profile?.name ?? (username || "Perfil de Minecraft")}
               </h2>
               <span className="result-modal-subtitle">{subtitle}</span>
+              <SaveNicknameRow
+                nickname={profile?.name ?? username}
+                align="start"
+              />
             </div>
           </div>
         </header>

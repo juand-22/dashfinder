@@ -1,6 +1,9 @@
 import type { KeyboardEvent, MouseEvent } from "react";
+import { Link } from "react-router-dom";
+import type { DehashFeedback } from "../../../dehashes/types";
 import type { FindRecord, IpCountry } from "../../types";
 import { isHashedPassword } from "../../../../utils/password";
+import { SaveNicknameButton } from "../../../mod-nicknames/components/SaveNicknameButton";
 import { CopyButton } from "../common/CopyButton";
 
 type ResultCardProps = {
@@ -8,12 +11,13 @@ type ResultCardProps = {
   index: number;
   copiedTarget: string | null;
   ipCountry: IpCountry | null;
-  hashNotice: number | null;
+  /** Aviso del envío a dehashear, solo si es de este registro. */
+  dehashFeedback: DehashFeedback | null;
   isPasswordVisible: boolean;
   isModal?: boolean;
   onCopy: (value: string, target: string) => void;
   onTogglePassword: (index: number) => void;
-  onToggleHashNotice: (index: number) => void;
+  onDehash: (record: FindRecord, index: number) => void;
   onOpen?: (record: FindRecord, index: number, opener: HTMLElement) => void;
 };
 
@@ -22,12 +26,12 @@ export function ResultCard({
   index,
   copiedTarget,
   ipCountry,
-  hashNotice,
+  dehashFeedback,
   isPasswordVisible,
   isModal = false,
   onCopy,
   onTogglePassword,
-  onToggleHashNotice,
+  onDehash,
   onOpen,
 }: ResultCardProps) {
   const isHashed = isHashedPassword(record.password);
@@ -36,7 +40,9 @@ export function ResultCard({
 
   function handleClick(event: MouseEvent<HTMLElement>) {
     if (isModal || !onOpen) return;
-    if (event.target instanceof Element && event.target.closest("button")) return;
+    if (event.target instanceof Element && event.target.closest("button, a")) {
+      return;
+    }
     onOpen(record, index, event.currentTarget);
   }
 
@@ -182,7 +188,7 @@ export function ResultCard({
                 type="button"
                 disabled={!isHashed || !hasPassword}
                 onClick={() => {
-                  onToggleHashNotice(index);
+                  onDehash(record, index);
                   if (!isPasswordVisible) onTogglePassword(index);
                 }}
               >
@@ -205,14 +211,26 @@ export function ResultCard({
                   Copiar contraseña
                 </button>
               )}
+              <SaveNicknameButton nickname={record.name} />
             </div>
           </dd>
         </div>
       </dl>
-      {isHashed && hashNotice === index && (
-        <p className="hash-notice" role="status">
-          Un hash no se puede revertir para recuperar la contraseña original.
-          Puedes consultar el hash mostrado, pero no deshashearlo.
+      {/* Este card no es la página de dehashes, así que el aviso lleva el link. */}
+      {isHashed && dehashFeedback !== null && (
+        <p
+          className={`hash-notice${dehashFeedback.tone === "error" ? " hash-notice--error" : ""}`}
+          role="status"
+        >
+          {dehashFeedback.tone === "info" ? (
+            <>
+              {dehashFeedback.message}{" "}
+              <Link to="/dehashes">Revisá tu página Dehashes</Link> para ver el
+              estado de tu hash.
+            </>
+          ) : (
+            dehashFeedback.message
+          )}
         </p>
       )}
     </article>

@@ -18,7 +18,6 @@ public class ApiSender {
     private static final Gson gson = new Gson();
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    /** Manda los jugadores del tab list al backend (`POST /mod/recive`). */
     public static void sendPlayerData(String server, List<JsonObject> players) {
         if (!DashConfig.isConfigured()) return;
 

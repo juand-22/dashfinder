@@ -76,12 +76,24 @@ export function DashboardLayout({
           </NavLink>
           <NavLink
             className={({ isActive }) => `main-nav-link${isActive ? " active" : ""}`}
+            to="/mod-nicknames"
+            title="Dash nicknames"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <circle cx="7.4" cy="7.6" r="2.6" />
+              <path d="M2.8 16c.5-2.6 2.4-4.2 4.6-4.2s4.1 1.6 4.6 4.2" />
+              <path d="M14.2 8h3.4M14.2 11.7h3.4" />
+            </svg>
+            <span className="main-nav-link-label">Dash nicknames</span>
+          </NavLink>
+          <NavLink
+            className={({ isActive }) => `main-nav-link${isActive ? " active" : ""}`}
             to="/configuracion"
             title="Configuración"
           >
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M8 3h4l.6 2.1 1.8 1 2-.6 2 3.5-1.5 1.5v2l1.5 1.5-2 3.5-2-.6-1.8 1L12 20H8l-.6-2.1-1.8-1-2 .6-2-3.5L3.1 12v-2L1.6 8.5l2-3.5 2 .6 1.8-1L8 3Z" transform="translate(0 -1.5) scale(.9)" />
-              <circle cx="10" cy="10" r="2.5" />
+              <path d="M16.9 10 13.4 4H6.6L3.1 10 6.6 16H13.4Z" />
+              <circle cx="10" cy="10" r="2.6" />
             </svg>
             <span className="main-nav-link-label">Configuración</span>
           </NavLink>
@@ -105,7 +117,12 @@ export function DashboardLayout({
         </div>
 
         <div className="sidebar-divider" />
-        <div className="sidebar-user" title={username ?? "Cuenta activa"}>
+        <Link
+          className="sidebar-user"
+          to="/configuracion"
+          title="Ir a configuración"
+          aria-label={`Ir a configuración de ${username ?? "tu cuenta"}`}
+        >
           <span className="user-avatar" aria-hidden="true">
             {(username?.charAt(0) || "U").toUpperCase()}
           </span>
@@ -113,7 +130,7 @@ export function DashboardLayout({
             <strong>{username}</strong>
             <small>Cuenta activa</small>
           </span>
-        </div>
+        </Link>
       </aside>
 
       <div className="home-workspace">

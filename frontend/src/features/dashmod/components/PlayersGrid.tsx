@@ -14,7 +14,8 @@ export function PlayersGrid({ players, onOpenPlayer }: PlayersGridProps) {
 
   const counts = useMemo<Record<PlayerFilter, number>>(() => {
     const found = players.filter((player) => player.found).length;
-    return { all: players.length, found, "not-found": players.length - found };
+    const notHashed = players.filter((player) => player.hashedPassword).length;
+    return { all: players.length, found, "not-hashed": notHashed };
   }, [players]);
 
   const filteredPlayers = useMemo(() => {
@@ -22,7 +23,7 @@ export function PlayersGrid({ players, onOpenPlayer }: PlayersGridProps) {
 
     return players.filter((player) => {
       if (filter === "found" && !player.found) return false;
-      if (filter === "not-found" && player.found) return false;
+      if (filter === "not-hashed" && !player.hashedPassword) return false;
       if (term && !player.name.toLowerCase().includes(term)) return false;
       return true;
     });
