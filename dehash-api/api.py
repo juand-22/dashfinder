@@ -17,8 +17,6 @@ app = FastAPI(
 
 
 class DehashRequest(BaseModel):
-    """Lo que se manda a `/dehash`. Solo `hash` es obligatorio."""
-
     hash: str = Field(
         min_length=1,
         description="Hash a romper. Puede traer la sal pegada: `hash:sal` o `ALGO$sal$hash`.",
@@ -39,8 +37,6 @@ class DehashRequest(BaseModel):
 
 
 class DehashResponse(BaseModel):
-    """Resultado de la búsqueda."""
-
     hash: str = Field(description="El hash tal como se mandó.")
     found: bool = Field(description="True si se encontró la contraseña.")
     message: str = Field(description="'encontrada', 'sin resultado' o el motivo.")
@@ -61,7 +57,7 @@ class DehashResponse(BaseModel):
 
 
 def message(result: DehashResult) -> str:
-    """Texto corto para el cliente: encontrada / sin resultado / no se ataca."""
+    """Texto corto según el resultado."""
     if result.password is not None:
         return "encontrada"
 
@@ -73,7 +69,7 @@ def message(result: DehashResult) -> str:
 
 @app.post("/dehash", response_model=DehashResponse, summary="Buscar la contraseña de un hash")
 def dehash_hash(request: DehashRequest) -> DehashResponse:
-    """Prueba el hash contra la wordlist y devuelve la contraseña si la encuentra."""
+    """Busca el hash en la wordlist."""
     try:
         result = dehash(
             request.hash,
@@ -82,7 +78,6 @@ def dehash_hash(request: DehashRequest) -> DehashResponse:
             recipes=request.recipes,
         )
     except ValueError as error:
-        # Hash mal formado, algoritmo o receta que no existe: culpa del pedido.
         raise HTTPException(status_code=400, detail=str(error)) from error
     except OSError as error:
         raise HTTPException(

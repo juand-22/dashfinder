@@ -14,7 +14,7 @@ from typing import Any
 
 WORDLIST_PATH = Path(__file__).resolve().parent / "wordlist.txt"
 
-# Hashes sin sal: el algoritmo se deduce del largo del hash en hexadecimal.
+# Algoritmo según el largo del hash hexadecimal.
 HEX_ALGORITHMS: dict[int, tuple[str, ...]] = {
     32: ("md5",),
     40: ("sha1",),
@@ -28,26 +28,20 @@ SUPPORTED_ALGORITHMS = tuple(
     algorithm for algorithms in HEX_ALGORITHMS.values() for algorithm in algorithms
 )
 
-# Al revés que HEX_ALGORITHMS: cuántos caracteres hexadecimales tiene cada uno,
-# para los formatos que ya traen el nombre del algoritmo (`SHA256$sal$hash`).
+# Largo esperado por algoritmo.
 ALGORITHM_LENGTHS: dict[str, int] = {
     algorithm: length
     for length, algorithms in HEX_ALGORITHMS.items()
     for algorithm in algorithms
 }
 
-# Nombres de algoritmo que pueden venir escritos en el propio hash. `SHA` solo
-# (AuthMe llama así al sha256) es ambiguo entre sha1 y sha256: se resuelve por
-# el largo del hash.
+# Alias que pueden venir en el hash; `sha` se resuelve por el largo.
 ALGORITHM_ALIASES: dict[str, tuple[str, ...]] = {
     **{algorithm: (algorithm,) for algorithm in ALGORITHM_LENGTHS},
     "sha": ("sha256", "sha1"),
 }
 
-# Construcciones típicas de contraseña + sal, en orden de probabilidad.
-# `pw` es la palabra candidata, `hashhex`/`hashraw` el hash interno en
-# hexadecimal o crudo (los CMS viejos suelen hashear el hex: XenForo,
-# vBulletin, IPB...).
+# Recetas con sal, en orden de probabilidad.
 SALT_RECIPES: dict[str, str] = {
     "sal+pw": "hash(sal + pw)",
     "pw+sal": "hash(pw + sal)",
@@ -56,8 +50,7 @@ SALT_RECIPES: dict[str, str] = {
     "hashraw+sal": "hash(hash_raw(pw) + sal)",
 }
 
-# Formatos con sal en un solo string (o que necesitan otra librería): todavía
-# no se atacan.
+# Formatos que todavía no se atacan.
 UNSUPPORTED_KINDS = {
     "$2a$": "bcrypt",
     "$2b$": "bcrypt",
@@ -73,27 +66,25 @@ HEX_RE = re.compile(r"\A[0-9a-fA-F]+\Z")
 
 @dataclass
 class DehashResult:
-    """Resultado de intentar romper un hash."""
-
-    password: str | None  # contraseña en texto plano, si se encontró
-    algorithm: str | None  # algoritmo con el que se encontró
-    kind: str  # tipo detectado del hash (md5, sha256, bcrypt, salado...)
-    candidates: int  # palabras probadas
-    elapsed: float  # segundos que tardó
-    recipe: str | None = None  # receta con sal que dio el match (sin sal: None)
-    salt: str | None = None  # sal usada (propia o sacada del `hash:sal`)
-    tolerant: bool = False  # el hash venía con un carácter de menos
-    missing_position: int | None = None  # posición (1-based) del carácter que falta
-    missing_char: str | None = None  # el carácter que falta
+    password: str | None
+    algorithm: str | None
+    kind: str
+    candidates: int
+    elapsed: float
+    recipe: str | None = None
+    salt: str | None = None
+    tolerant: bool = False
+    missing_position: int | None = None
+    missing_char: str | None = None
 
 
 def is_supported_hash(value: str) -> bool:
-    """True si el valor es un hash hexadecimal de un algoritmo que atacamos."""
+    """True si es un hash hexadecimal soportado."""
     return bool(HEX_RE.match(value)) and len(value) in HEX_ALGORITHMS
 
 
 def detect_kind(hash_value: str) -> str:
-    """Tipo de hash según su formato, para saber si se puede atacar o no."""
+    """Tipo de hash según su formato."""
     value = hash_value.strip()
 
     if is_supported_hash(value):
@@ -110,21 +101,12 @@ def detect_kind(hash_value: str) -> str:
 
 
 def normalize_algorithms(token: str) -> tuple[str, ...]:
-    """`SHA256` / `sha-256` / `MD5` -> los algoritmos que puede ser (o vacío)."""
+    """Normaliza el nombre del algoritmo."""
     return ALGORITHM_ALIASES.get(re.sub(r"[^a-z0-9]", "", token.lower()), ())
 
 
 def split_formats(value: str) -> tuple[str, str | None, str | None]:
-    """Separa los formatos que ya traen todo pegado en un solo string.
-
-    - `hash:sal` y `sal:hash`
-    - `algoritmo$sal$hash` y `algoritmo$hash$sal`, con o sin el `$` adelante
-      (`$SHA$sal$hash` es el de AuthMe). El algoritmo se reconoce por el nombre
-      del primer campo y el hash por tener el largo de ese algoritmo.
-
-    Devuelve `(hash, algoritmo, sal)`; lo que no se reconoce queda como estaba,
-    con `algoritmo`/`sal` en None.
-    """
+    """Separa `hash:sal` y `ALGO$sal$hash` en `(hash, algoritmo, sal)`."""
     parts = value.split("$")
 
     if len(parts) > 1 and not parts[0]:
@@ -141,8 +123,7 @@ def split_formats(value: str) -> tuple[str, str | None, str | None]:
                     return parts[index], candidate, parts[3 - index]
 
         if candidates:
-            # El hash no tiene el largo del algoritmo: se lo dejamos puesto
-            # igual para que el error diga qué se esperaba.
+            # Se devuelve igual para que el error indique el largo esperado.
             return parts[2], candidates[0], parts[1]
 
     left, separator, right = value.partition(":")
@@ -158,14 +139,7 @@ def split_formats(value: str) -> tuple[str, str | None, str | None]:
 
 
 def missing_char_index(digest: bytes, target: str) -> int | None:
-    """Posición del carácter que le falta a `target` para ser `digest`.
-
-    `target` es el hexadecimal de `digest` con un carácter borrado en algún
-    lado. Alcanza con ver dónde empiezan a diferir: el que falta está justo en
-    esa posición y el resto tiene que coincidir corrido un lugar.
-
-    Devuelve la posición (0-based) o None si no coincide.
-    """
+    """Posición 0-based del carácter que falta en `target`, o None."""
     hexdigest = digest.hex()
     index = 0
 
@@ -179,7 +153,7 @@ def missing_char_index(digest: bytes, target: str) -> int | None:
 
 
 def describe(hash_value: str, recipes: Sequence[str] | None = None) -> list[str]:
-    """Explica cómo se interpreta un valor, sin escanear nada (para `--info`)."""
+    """Explica el formato del hash sin escanear (`--info`)."""
     original = hash_value.strip()
     target, algorithm, salt = split_formats(original)
 
@@ -247,7 +221,7 @@ def plain_check(hasher: Any) -> Callable[[bytes], bytes]:
 
 
 def salt_check(recipe: str, hasher: Any, salt: bytes) -> Callable[[bytes], bytes]:
-    """Digest que corresponde a `recipe` para esa sal."""
+    """Digest según la receta y la sal."""
 
     def inner(word: bytes) -> bytes:
         return hasher(word).digest()
@@ -281,22 +255,9 @@ def dehash(
     recipes: Sequence[str] | None = None,
     progress: Callable[[float, int, float], None] | None = None,
 ) -> DehashResult:
-    """Intenta romper `hash_value` contra las palabras de `wordlist`.
+    """Busca `hash_value` en `wordlist` y devuelve el resultado.
 
-    Si no se indica `algorithm` se deduce del largo del hash, o del propio
-    string si viene en formato `algoritmo$sal$hash`. Si el hash trae la sal
-    pegada (`hash:sal`, `algoritmo$sal$hash`) se separa sola; con `salt` se
-    prueban las recetas de `recipes` (por defecto, todas las de SALT_RECIPES).
-    Los formatos que no se pueden atacar (bcrypt, salados en un solo string,
-    desconocidos) no lanzan excepción: devuelven `password=None` con el motivo
-    en `kind` y 0 candidatos. Si al hash le falta un carácter (columnas
-    truncadas) igual se busca: se compara todo menos un carácter y el resultado
-    dice cuál faltaba y en qué posición.
-
-    `progress` es un callback opcional al que se le pasa el avance del escaneo
-    (fracción 0-1 de la wordlist, palabras probadas, segundos transcurridos).
-    Se llama cada ~0,15 s, así que sirve para dibujar una barra sin frenar la
-    búsqueda.
+    `progress` recibe (fracción, intentos, segundos) cada ~0,15 s.
     """
     target, embedded_algorithm, embedded_salt = split_formats(hash_value.strip())
 
@@ -308,7 +269,7 @@ def dehash(
 
     if salt is None and recipes:
         raise ValueError(
-            "Se pidieron recetas con sal pero no hay sal: indicala aparte o "
+            "Se pidieron recetas con sal pero no hay sal: indícala aparte o "
             "dentro del propio hash (hash:sal, ALGO$sal$hash)."
         )
 
@@ -323,7 +284,6 @@ def dehash(
     else:
         algorithms = ()
 
-    # Nada que probar: el formato no es uno de los que sabemos romper.
     if not algorithms:
         return DehashResult(
             password=None, algorithm=None, kind=kind, candidates=0, elapsed=0.0
@@ -349,8 +309,7 @@ def dehash(
             continue
 
         if expected - 1 == len(target):
-            # Columna truncada: al hash le falta un carácter. Se puede
-            # encontrar igual, comparando todo el hash menos un carácter.
+            # Hash con un carácter de menos: se busca igual.
             tolerant = True
             kind = name  # el formato ya decía qué algoritmo era
             hashers.append((name, hasher))
@@ -361,7 +320,6 @@ def dehash(
             f"no {expected} (un {name.upper()})."
         )
 
-    # Cada chequeo es (algoritmo, receta, función que calcula el digest).
     checks: list[tuple[str, str | None, Callable[[bytes], bytes]]] = []
 
     if salt is None:
@@ -382,8 +340,7 @@ def dehash(
             for recipe in selected:
                 checks.append((name, recipe, salt_check(recipe, hasher, salt_bytes)))
 
-    # En el modo tolerante al hash le falta un carácter, así que tiene largo
-    # impar y no se puede pasar a bytes: se compara como texto.
+    # Con un carácter de menos el largo es impar: se compara como texto.
     if len(target) % 2:
         target_digest = None
     else:
@@ -405,8 +362,7 @@ def dehash(
 
             candidates += 1
 
-            # Avisamos del avance cada ~0,15 s (mirar el reloj en cada palabra
-            # costaría más que el propio hash).
+            # Avisar cada ~0,15 s para no frenar el escaneo.
             if progress is not None and candidates % 5000 == 0:
                 now = time.perf_counter()
 
@@ -422,8 +378,6 @@ def dehash(
                 digest = check(candidate)
 
                 if tolerant:
-                    # Al hash le falta un carácter: vale si coincide todo el
-                    # resto, y de paso sabemos cuál era y dónde iba.
                     missing = missing_char_index(digest, target)
                     found = missing is not None
                 else:
@@ -458,7 +412,7 @@ def dehash(
 
 
 def format_number(value: int) -> str:
-    """1234567 -> 1.234.567 (estilo es-AR, igual que el panel)."""
+    """1234567 -> 1.234.567."""
     return f"{value:,}".replace(",", ".")
 
 
@@ -472,12 +426,7 @@ def format_duration(seconds: float) -> str:
 
 
 class ProgressLine:
-    """Dibuja el avance del escaneo en una sola línea (por stderr).
-
-    En una terminal se va reescribiendo la misma línea y se borra al terminar,
-    para que el resultado salga limpio. Si la salida está redirigida a un
-    archivo se escriben líneas sueltas cada 25 %.
-    """
+    """Progreso en una línea de stderr: se reescribe en TTY o se imprime cada 25 %."""
 
     def __init__(self, label: str, stream: Any = None) -> None:
         self.label = label if len(label) <= 20 else f"{label[:17]}..."
@@ -527,8 +476,7 @@ class ProgressLine:
 
 
 def main(argv: list[str] | None = None) -> int:
-    # La consola de Windows no siempre es UTF-8 (y las contraseñas pueden
-    # tener acentos o símbolos): forzamos la codificación de la salida.
+    # Forzar UTF-8 en la salida (consola de Windows).
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="replace")
@@ -569,7 +517,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--no-progress",
         action="store_true",
-        help="no mostrar el avance del escaneo (útil si redirigís la salida)",
+        help="no mostrar el avance del escaneo (útil al redirigir la salida)",
     )
     parser.add_argument(
         "-i",
